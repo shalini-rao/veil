@@ -1,0 +1,7 @@
+# Source photos — already embedded as base64 in the prototype, ~27MB on disk
+*.JPG
+*.jpg
+
+# Editor / tooling
+.claude/
+.DS_Store
