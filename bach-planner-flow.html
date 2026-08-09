@@ -1,0 +1,175 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<div id="wrap">
+<style>
+  #wrap { font-family: 'Inter', system-ui, sans-serif; padding: 12px 8px 40px; color: #2b2733; }
+  h1 { font-family: 'Fraunces', serif; font-weight: 600; font-size: 24px; margin: 4px 0 2px; padding-left: 8px; }
+  .sub { color: #8a7f8e; font-size: 13px; margin-bottom: 16px; padding-left: 8px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 0 0 16px 8px; font-size: 12px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; color: #6b6470; }
+  .dot { width: 11px; height: 11px; border-radius: 3px; }
+
+  .rail { display: flex; align-items: center; gap: 0; overflow-x: auto; padding: 10px 8px 18px; }
+  .col { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+  .col.narrow { min-width: 172px; }
+
+  .node { background: #fff; border: 1px solid #ece3ec; border-radius: 13px; padding: 10px 12px; box-shadow: 0 2px 8px rgba(80,50,80,0.04); }
+  .node h3 { margin: 0 0 4px; font-size: 12.5px; font-weight: 700; }
+  .node p { margin: 0; font-size: 11px; color: #7a7280; line-height: 1.4; }
+  .node .tag { display: inline-block; margin-top: 6px; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 999px; }
+  .stepnum { color: #b89; font-weight: 700; }
+  .card-warm { border-color: #ecd9c4; background: #fdf8f1; }
+  .card-core { border-color: #d9c9e8; background: #f8f4fd; }
+  .card-bride { border-color: #f0cdd9; background: #fdf1f5; }
+  .t-plan { background: #ede4f7; color: #7a4fb0; }
+  .t-all { background: #dcefe4; color: #3f8c66; }
+  .grouplabel { font-size: 10px; letter-spacing: 0.09em; text-transform: uppercase; color: #a89ba6; font-weight: 700; margin-bottom: 3px; }
+
+  .connect { display: flex; align-items: center; color: #cbb9c8; font-size: 24px; padding: 0 3px; flex-shrink: 0; }
+
+  /* the fork zone: an SVG of branching lines flanked by the two path columns */
+  .forkzone { display: flex; align-items: center; flex-shrink: 0; }
+  .branchsvg { flex-shrink: 0; }
+  .paths { display: flex; flex-direction: column; gap: 26px; }
+  .pathrow { display: flex; align-items: center; gap: 8px; }
+  .pathbadge { font-size: 9px; font-weight: 800; letter-spacing: 0.06em; color: #fff; padding: 3px 7px; border-radius: 6px; }
+  .badge-a { background: #5a9c78; }
+  .badge-b { background: #7a4fb0; }
+
+  .createline { display: flex; align-items: center; gap: 0; }
+
+  .appcol { min-width: 360px; flex-shrink: 0; }
+  .tabs2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .tab { border-radius: 12px; overflow: hidden; border: 1px solid #ece3ec; background:#fff; }
+  .tab-head { padding: 7px 10px; font-weight: 700; font-size: 12px; color: #fff; }
+  .tab-body { padding: 8px 10px; }
+  .tab-body ul { margin: 0; padding-left: 13px; }
+  .tab-body li { font-size: 10px; color: #6b6470; line-height: 1.5; }
+  .h-home { background: #b87a4f; } .h-msg { background: #a86fb0; }
+  .h-exp { background: #5a9c78; } .h-acct { background: #7a8494; }
+
+  .rejoinsvg { flex-shrink: 0; }
+
+  .thread { margin: 26px 8px 0; border: 1.5px dashed #e6a3bd; border-radius: 16px; padding: 14px 16px; background: #fdf4f8; }
+  .thread h2 { font-family: 'Fraunces', serif; font-weight: 600; font-size: 16px; margin: 0 0 4px; color: #b34a72; }
+  .thread p { font-size: 12px; color: #8a6675; margin: 0 0 12px; }
+  .thread-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .thread-row .node { border-color: #f0cdd9; flex: 1; min-width: 200px; }
+  .hint { font-size: 11px; color: #b0a3ae; padding-left: 8px; margin-top: 2px; }
+</style>
+
+<h1>Bachelorette Planner — MVP Flow Map</h1>
+<div class="sub">Account creation is shared, then the flow forks: guests confirm a join, the creator builds the group. Both land in the four-tab app.</div>
+<div class="legend">
+  <span><span class="dot" style="background:#5a9c78"></span>Path A · joins via link</span>
+  <span><span class="dot" style="background:#7a4fb0"></span>Path B · creates the group</span>
+  <span><span class="dot" style="background:#b34a72"></span>Bride-visibility rule</span>
+</div>
+
+<div class="rail">
+
+  <!-- Entry -->
+  <div class="col narrow">
+    <div class="grouplabel">Entry</div>
+    <div class="node"><h3>Fresh start (MOH)</h3><p>No group yet.</p></div>
+    <div class="node"><h3>Join link</h3><p>Got a role link.</p></div>
+  </div>
+
+  <div class="connect">→</div>
+
+  <!-- Account (shared) -->
+  <div class="col narrow">
+    <div class="grouplabel">Account · shared</div>
+    <div class="node card-core"><h3><span class="stepnum">1 </span>Phone #</h3><p>Required.</p></div>
+    <div class="node card-core"><h3><span class="stepnum">2 </span>Display name</h3><p>Required.</p></div>
+    <div class="node card-core"><h3><span class="stepnum">3 </span>Photo</h3><p>Optional.</p></div>
+    <div class="node card-core"><h3><span class="stepnum">4 </span>Venmo / Zelle</h3><p>Optional, shown.</p></div>
+  </div>
+
+  <!-- THE FORK -->
+  <div class="forkzone">
+    <svg class="branchsvg" width="52" height="200" viewBox="0 0 52 200">
+      <path d="M0 100 H18 Q30 100 30 74 V44" fill="none" stroke="#5a9c78" stroke-width="2.5"/>
+      <path d="M0 100 H18 Q30 100 30 126 V156" fill="none" stroke="#7a4fb0" stroke-width="2.5"/>
+      <circle cx="0" cy="100" r="3.5" fill="#c9b8c6"/>
+      <polygon points="30,44 26,52 34,52" fill="#5a9c78"/>
+      <polygon points="30,156 26,148 34,148" fill="#7a4fb0"/>
+    </svg>
+    <div class="paths">
+      <div class="pathrow">
+        <span class="pathbadge badge-a">A</span>
+        <div class="node" style="min-width:150px"><h3>Confirm join</h3><p>"You're invited to [XYZ]." Role = which link they used.</p><span class="tag t-all">→ app</span></div>
+      </div>
+      <div class="pathrow">
+        <span class="pathbadge badge-b">B</span>
+        <div class="node card-core" style="min-width:150px"><h3>Create a group</h3><p>The creator keeps going →</p><span class="tag t-plan">planner</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Path B continues: create group + invites -->
+  <div class="connect" style="color:#7a4fb0">→</div>
+  <div class="col narrow">
+    <div class="grouplabel" style="color:#7a4fb0">Path B · build it</div>
+    <div class="node"><h3>Name + dates</h3><p>The basics.</p></div>
+    <div class="node card-warm"><h3>Theme picker</h3><p>Desert Warmth / Playful Pop. Once.</p></div>
+    <div class="node card-bride"><h3>Role setup</h3><p>Co-planners? Bride access? Self-hide?</p></div>
+    <div class="node"><h3>Seed events</h3><p>Add known events.</p></div>
+    <div class="node card-core"><h3>3 invite links</h3><p>Planning · Bride · Everyone.</p></div>
+  </div>
+
+  <!-- Rejoin: both paths merge into the app -->
+  <div class="forkzone">
+    <svg class="rejoinsvg" width="52" height="200" viewBox="0 0 52 200">
+      <path d="M0 44 V74 Q0 100 12 100 H52" fill="none" stroke="#5a9c78" stroke-width="2.5"/>
+      <path d="M22 156 V126 Q22 100 34 100 H52" fill="none" stroke="#7a4fb0" stroke-width="2.5"/>
+      <polygon points="52,100 44,96 44,104" fill="#b87a4f"/>
+    </svg>
+  </div>
+
+  <!-- The app -->
+  <div class="col appcol">
+    <div class="grouplabel">Everyone → the app · 4 tabs</div>
+    <div class="tabs2">
+      <div class="tab"><div class="tab-head h-home">🏠 Home</div><div class="tab-body"><ul>
+        <li>Pre: "Get pumped" + day countdown</li>
+        <li>During: current day/hour</li>
+        <li>"Coming up in Xh Ym"</li>
+        <li>Itinerary = main page</li>
+        <li>Auto-cropped day hours</li>
+      </ul></div></div>
+      <div class="tab"><div class="tab-head h-msg">💬 Messaging</div><div class="tab-body"><ul>
+        <li>+bride / −bride boards</li>
+        <li>Planner-only boards</li>
+        <li>Announcements → pinned</li>
+        <li>Mirror to Announcements board</li>
+        <li>Secret tag when bride-excluded</li>
+      </ul></div></div>
+      <div class="tab"><div class="tab-head h-exp">💸 Expenses</div><div class="tab-body"><ul>
+        <li>"What you owe" (net)</li>
+        <li>Events + standalone expenses</li>
+        <li>Non-planner → pending → confirm</li>
+        <li>Debt-simplified settle-up</li>
+        <li>Close out + early-settle warning</li>
+      </ul></div></div>
+      <div class="tab"><div class="tab-head h-acct">⚙️ Account</div><div class="tab-body"><ul>
+        <li>Profile: name, photo</li>
+        <li>Venmo / Zelle handle</li>
+        <li>Settings</li>
+      </ul></div></div>
+    </div>
+  </div>
+
+</div>
+<div class="hint">← scroll horizontally →</div>
+
+<div class="thread">
+  <h2>The through-line: bride visibility</h2>
+  <p>One rule, honored identically on every surface. This is the app's signature.</p>
+  <div class="thread-row">
+    <div class="node"><h3>Itinerary</h3><p>Hidden events omitted (no gap). Teased shown as a mystery card.</p></div>
+    <div class="node"><h3>Expenses</h3><p>Secret expenses drop out of her total <i>before</i> settle-up math runs.</p></div>
+    <div class="node"><h3>Messaging</h3><p>Sees only announcements from boards she's in. Others carry a "secret" tag.</p></div>
+  </div>
+</div>
+</div>

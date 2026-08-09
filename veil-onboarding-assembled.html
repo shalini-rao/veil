@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veil — Onboarding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cormorant+Garamond:wght@600&family=DM+Sans:wght@400;600&family=EB+Garamond:wght@600&family=Fredoka:wght@600&family=Jost:wght@400&family=Poppins:wght@400&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* neutral baseline theme */
+    --surface-page: #F7F6F4; --surface-card: #FFFFFF;
+    --ink-primary: #1F1D1B; --ink-secondary: #6B6660;
+    --accent: #2E2A26; --ink-on-accent: #FFFFFF;
+    --border-subtle: #E2DED8;
+    --gold: #C9A227;
+    --radius-sm: 8px;
+    --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 32px;
+    --font-neutral: 'Inter', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #dcd8de; display: flex; flex-wrap: wrap; gap: 28px; justify-content: center; padding: 40px 20px 60px; font-family: var(--font-neutral); }
+  .screen { width: 393px; height: 852px; background: var(--surface-page); border-radius: 34px; box-shadow: 0 16px 50px rgba(60,40,60,0.18); position: relative; overflow: hidden; color: var(--ink-primary); display: flex; flex-direction: column; align-items: center; padding: 70px 28px 0; }
+  .screen-label { position: absolute; top: -24px; left: 4px; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #6b6470; font-weight: 600; }
+  .num { font-feature-settings: "tnum" 1; }
+
+  /* gold script wordmark stand-in for the real logo asset */
+  .wordmark { font-family: 'Dancing Script', cursive; font-weight: 700; font-size: 96px; line-height: 1; background: linear-gradient(135deg, #B8860B 0%, #E6C34A 40%, #C9A227 70%, #9C7A15 100%); -webkit-background-clip: text; background-clip: text; color: transparent; margin-top: 10px; }
+  .logo-block { display: flex; justify-content: center; width: 100%; margin-bottom: 40px; }
+
+  .field-group { width: 100%; display: flex; flex-direction: column; gap: var(--space-2); margin-bottom: var(--space-5); }
+  .label { font-size: 15px; color: var(--ink-primary); font-weight: 500; }
+  .label .opt { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-secondary); font-weight: 600; margin-left: 6px; }
+  .input { width: 100%; min-height: 48px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--surface-card); padding: 0 var(--space-4); display: flex; align-items: center; font-size: 15px; color: var(--ink-secondary); }
+
+  .photo-btn { width: 96px; height: 96px; border-radius: 50%; background: #F5EFD8; display: flex; align-items: center; justify-content: center; margin: 4px auto var(--space-2); }
+  .photo-btn svg { width: 40px; height: 40px; color: #b0a06a; }
+
+  /* headers on later steps */
+  .party-title { font-family: var(--font-neutral); font-weight: 700; font-size: 40px; line-height: 1.1; text-align: center; }
+  .party-dates { font-family: var(--font-neutral); font-weight: 600; font-size: 22px; text-align: center; margin-top: 6px; }
+  .party-head { width: 100%; margin-bottom: var(--space-6); }
+  .welcome { font-family: var(--font-neutral); font-weight: 700; font-size: 30px; text-align: center; margin-bottom: var(--space-5); }
+
+  .q-label { font-size: 15px; color: var(--ink-primary); margin-bottom: 10px; }
+  .q-block { width: 100%; margin-bottom: var(--space-5); }
+  .pill-row { display: flex; gap: var(--space-3); align-items: center; }
+  .pill { min-width: 56px; height: 44px; padding: 0 20px; border-radius: 22px; border: 1px solid var(--ink-primary); display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; line-height: 1; background: transparent; color: var(--ink-primary); box-sizing: border-box; }
+  .pill.on { background: var(--accent); color: var(--ink-on-accent); border-color: var(--accent); }
+
+  /* date picker: full month */
+  .datepicker { width: 100%; border: 1px solid var(--border-subtle); border-radius: 12px; background: var(--surface-card); padding: var(--space-4); box-shadow: 0 4px 16px rgba(60,40,60,0.06); }
+  .dp-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); }
+  .dp-arrow { width: 36px; height: 36px; border: 1px solid var(--border-subtle); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .dp-arrow svg { width: 18px; height: 18px; color: var(--ink-primary); }
+  .dp-month { font-weight: 600; font-size: 16px; }
+  .dp-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .dp-dow { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--ink-secondary); font-weight: 500; }
+  .dp-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--ink-primary); }
+  .dp-cell.dim { color: #C5BFB6; }
+  .dp-cell.sel { background: var(--accent); color: var(--ink-on-accent); border-radius: 50%; font-weight: 600; }
+  .dp-cell.range { background: #DAD5CD; }
+  .dp-cell.range.rstart { border-radius: 50% 0 0 50%; }
+  .dp-cell.range.rend { border-radius: 0 50% 50% 0; }
+  .dp-foot { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-4); padding-top: var(--space-3); border-top: 1px solid var(--border-subtle); }
+  .dp-btn { height: 38px; padding: 0 18px; border-radius: 8px; display: flex; align-items: center; font-size: 14px; font-weight: 500; }
+  .dp-btn.cancel { border: 1px solid var(--border-subtle); background: var(--surface-card); color: var(--ink-primary); }
+  .dp-btn.done { background: var(--accent); color: var(--ink-on-accent); }
+
+  /* theme cards */
+  .theme-card { width: 100%; border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; margin-bottom: var(--space-3); }
+  .tc-body { padding: var(--space-4); display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-4); }
+  .tc-left { display: flex; flex-direction: column; gap: 4px; }
+  .tc-right { display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-3); }
+  .tc-title { font-size: 20px; font-weight: 600; }
+  .tc-sub { font-size: 14px; }
+  .tc-cap { font-size: 12px; }
+  .tc-btn { height: 40px; padding: 0 18px; border-radius: 8px; display: flex; align-items: center; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .tc-swatches { display: flex; gap: 10px; }
+  .sw { width: 28px; height: 28px; border-radius: 50%; }
+  .tc-foot { border-top: 1px solid var(--border-subtle); text-align: center; padding: 10px; font-size: 14px; font-weight: 500; }
+
+  /* Desert Warmth card */
+  .dw-card .tc-body { background: #F5EDE2; }
+  .dw-card .tc-title { font-family: 'Cormorant Garamond', serif; color: #2E2822; }
+  .dw-card .tc-sub, .dw-card .tc-cap { font-family: 'DM Sans', sans-serif; color: #7A6F63; }
+  .dw-card .tc-btn { background: #C4714B; color: #FFFEFB; }
+  /* Ivory Veil card */
+  .iv-card .tc-body { background: #FBF9F5; }
+  .iv-card .tc-title { font-family: 'EB Garamond', serif; color: #3A3630; }
+  .iv-card .tc-sub, .iv-card .tc-cap { font-family: 'Jost', sans-serif; color: #756B60; }
+  .iv-card .tc-btn { background: #C7A96B; color: #3A3630; }
+  /* Playful Pop card */
+  .pp-card .tc-body { background: #FDF3F8; }
+  .pp-card .tc-title { font-family: 'Fredoka', sans-serif; color: #2B2733; }
+  .pp-card .tc-sub, .pp-card .tc-cap { font-family: 'Poppins', sans-serif; color: #8A7F93; }
+  .pp-card .tc-btn { background: #F5617A; color: #FFFEFB; }
+</style>
+</head>
+<body>
+
+<!-- 1. LOGO ONLY -->
+<div class="screen">
+  <div class="screen-label">1 · Splash</div>
+  <div class="logo-block" style="margin-top:180px"><div class="wordmark">Veil</div></div>
+</div>
+
+<!-- 2. PHONE -->
+<div class="screen">
+  <div class="screen-label">2 · Phone number</div>
+  <div class="logo-block"><div class="wordmark">Veil</div></div>
+  <div class="field-group" style="margin-top:120px">
+    <div class="label">Phone number</div>
+    <div class="input">Your phone number</div>
+  </div>
+</div>
+
+<!-- 3. PROFILE CREATION -->
+<div class="screen">
+  <div class="screen-label">3 · Profile</div>
+  <div class="logo-block"><div class="wordmark" style="font-size:64px">Veil</div></div>
+  <div class="field-group">
+    <div class="label">How do you want your name displayed?</div>
+    <div class="input">What's your name?</div>
+  </div>
+  <div class="field-group">
+    <div class="label">Add a photo if you like<span class="opt">Optional</span></div>
+    <div class="photo-btn"><svg viewBox="0 0 24 24" fill="none"><path d="M2 8.4C2 7.5 2.6 6.5 3.7 6.4C4.2 6.3 4.9 6.2 5.4 5C5.7 4.2 6.5 4 7 4H17C17.5 4 18.3 4.2 18.6 5C19.1 6.2 19.8 6.3 20.3 6.4C21.4 6.5 22 7.5 22 8.4V17C22 18.7 21 19 20 19H4C3 19 2 18.7 2 17V8.4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="12.5" r="4" stroke="currentColor" stroke-width="2"/></svg></div>
+  </div>
+  <div class="field-group">
+    <div class="label">To make expenses easier<span class="opt">Optional</span></div>
+    <div class="input">Venmo handle</div>
+    <div class="input">Zelle handle</div>
+  </div>
+</div>
+
+<!-- 4. EVENT NAME -->
+<div class="screen">
+  <div class="screen-label">4 · Event name</div>
+  <div class="logo-block"><div class="wordmark" style="font-size:64px">Veil</div></div>
+  <div style="width:100%; margin-top:40px">
+    <div class="welcome">Welcome in, Shalini</div>
+    <div class="field-group">
+      <div class="label">What are we planning?</div>
+      <div class="input">Event name</div>
+    </div>
+  </div>
+</div>
+
+<!-- 5. EVENT DATES -->
+<div class="screen">
+  <div class="screen-label">5 · Event dates</div>
+  <div class="logo-block"><div class="wordmark" style="font-size:64px">Veil</div></div>
+  <div style="width:100%; margin-top:40px">
+    <div class="welcome">Let's plan Nidhi's Bach</div>
+    <div class="q-label">When is it?</div>
+    <div class="datepicker">
+      <div class="dp-head">
+        <div class="dp-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="dp-month">December 2026</div>
+        <div class="dp-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="dp-grid">
+        <div class="dp-dow">Su</div><div class="dp-dow">Mo</div><div class="dp-dow">Tu</div><div class="dp-dow">We</div><div class="dp-dow">Th</div><div class="dp-dow">Fr</div><div class="dp-dow">Sa</div>
+        <div class="dp-cell dim num">30</div><div class="dp-cell dim num">31</div><div class="dp-cell num">1</div><div class="dp-cell num">2</div><div class="dp-cell num">3</div><div class="dp-cell num">4</div><div class="dp-cell num">5</div>
+        <div class="dp-cell num">6</div><div class="dp-cell num">7</div><div class="dp-cell num">8</div><div class="dp-cell num">9</div><div class="dp-cell num">10</div><div class="dp-cell num">11</div><div class="dp-cell num">12</div>
+        <div class="dp-cell num">13</div><div class="dp-cell num">14</div><div class="dp-cell num">15</div><div class="dp-cell num">16</div><div class="dp-cell num">17</div><div class="dp-cell sel num">18</div><div class="dp-cell range rstart num">19</div>
+        <div class="dp-cell range rend num">20</div><div class="dp-cell sel num">21</div><div class="dp-cell num">22</div><div class="dp-cell num">23</div><div class="dp-cell num">24</div><div class="dp-cell num">25</div><div class="dp-cell num">26</div>
+        <div class="dp-cell num">27</div><div class="dp-cell num">28</div><div class="dp-cell num">29</div><div class="dp-cell num">30</div><div class="dp-cell num">31</div><div class="dp-cell dim num">1</div><div class="dp-cell dim num">2</div>
+      </div>
+      <div class="dp-foot">
+        <div class="dp-btn cancel">Cancel</div>
+        <div class="dp-btn done">Done</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 6. EVENT PLANNING (role questions) -->
+<div class="screen">
+  <div class="screen-label">6 · Role setup</div>
+  <div class="party-head">
+    <div class="party-title">Nidhi's Bach</div>
+    <div class="party-dates num">December 18-21, 2026</div>
+  </div>
+  <div class="q-block">
+    <div class="q-label">Are you the only planner?</div>
+    <div class="pill-row"><div class="pill on">Yes, just me</div><div class="pill">No</div></div>
+  </div>
+  <div class="q-block">
+    <div class="q-label">Are you the bride?</div>
+    <div class="pill-row"><div class="pill">Yes</div><div class="pill on">No</div></div>
+  </div>
+  <div class="q-block">
+    <div class="q-label">Is the bride helping plan?</div>
+    <div class="pill-row"><div class="pill on">Yes</div><div class="pill">No</div></div>
+  </div>
+  <div class="q-block">
+    <div class="q-label">Do you want surprises to be hidden from you?</div>
+    <div class="pill-row"><div class="pill">Yes</div><div class="pill">No</div></div>
+  </div>
+</div>
+
+<!-- 7. EVENT DETAILS (location + theme picker) -->
+<div class="screen">
+  <div class="screen-label">7 · Details + theme</div>
+  <div class="party-head">
+    <div class="party-title">Nidhi's Bach</div>
+    <div class="party-dates num">December 18-21, 2026</div>
+  </div>
+  <div class="field-group">
+    <div class="label">Where is Nidhi's Bach happening?</div>
+    <div class="input">Location</div>
+  </div>
+  <div style="width:100%">
+    <div class="q-label">Pick a theme for the Nidhi's Bach page</div>
+
+    <div class="theme-card dw-card">
+      <div class="tc-body">
+        <div class="tc-left">
+          <div class="tc-title">Nidhi's Bach</div>
+          <div class="tc-sub">Body text</div>
+          <div class="tc-cap">Caption</div>
+        </div>
+        <div class="tc-right">
+          <div class="tc-btn">Choose theme</div>
+          <div class="tc-swatches"><div class="sw" style="background:#7B9370"></div><div class="sw" style="background:#D9A566"></div><div class="sw" style="background:#E8D5C4"></div></div>
+        </div>
+      </div>
+      <div class="tc-foot">Desert Warmth</div>
+    </div>
+
+    <div class="theme-card iv-card">
+      <div class="tc-body">
+        <div class="tc-left">
+          <div class="tc-title">Nidhi's Bach</div>
+          <div class="tc-sub">Body text</div>
+          <div class="tc-cap">Caption</div>
+        </div>
+        <div class="tc-right">
+          <div class="tc-btn">Choose theme</div>
+          <div class="tc-swatches"><div class="sw" style="background:#8FA394"></div><div class="sw" style="background:#C9A9A0"></div><div class="sw" style="background:#EFE7D6"></div></div>
+        </div>
+      </div>
+      <div class="tc-foot">Ivory Veil</div>
+    </div>
+
+    <div class="theme-card pp-card">
+      <div class="tc-body">
+        <div class="tc-left">
+          <div class="tc-title">Nidhi's Bach</div>
+          <div class="tc-sub">Body text</div>
+          <div class="tc-cap">Caption</div>
+        </div>
+        <div class="tc-right">
+          <div class="tc-btn">Choose theme</div>
+          <div class="tc-swatches"><div class="sw" style="background:#8BB89A"></div><div class="sw" style="background:#E0A5C6"></div><div class="sw" style="background:#F7D9E4"></div></div>
+        </div>
+      </div>
+      <div class="tc-foot">Playful Pop</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
