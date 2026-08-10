@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --surface-page: #F5EDE2; --surface-card: #FFFBF5; --surface-disabled: #E7E1D8;
+  --surface-page: #F5EDE2; --surface-card: #FFFBF5; --surface-disabled: #E7E1D8; --past-edge:#C4BCB1;
   --ink-primary: #2E2822; --ink-secondary: #7A6F63;
   --accent: #C4714B; --accent-quiet: #E8D5C4; --ink-on-accent: #FFFEFB;
   --visibility-everyone: #7B9370; --visibility-teased: #D9A566; --visibility-hidden: #8C3A3F;
@@ -57,10 +57,10 @@ body{background:#dcd8de;display:flex;flex-direction:column;align-items:center;ga
 .top-fixed{flex-shrink:0;width:100%;padding:70px var(--space-5) var(--space-5);display:flex;flex-direction:column;align-items:center;gap:var(--space-5)}
 .head-row{display:flex;align-items:flex-end;justify-content:space-between;width:100%}
 .home-actions{display:flex;width:100%}
-.coming-up{width:100%;background:var(--surface-card);border-radius:var(--radius-card);padding:18px 20px;display:flex;align-items:center;justify-content:center;gap:14px;box-shadow:0 2px 10px rgba(60,40,60,.05);cursor:pointer}
+.coming-up{width:100%;background:var(--surface-card);border-radius:var(--radius-card);padding:18px 20px;display:flex;align-items:center;justify-content:flex-start;gap:14px;box-shadow:0 2px 10px rgba(60,40,60,.05);cursor:pointer}
 .cu-label{font-size:16px;line-height:20px;color:var(--ink-secondary);flex-shrink:0}
-.cu-body{display:flex;flex-direction:column}
-.cu-name{font-family:var(--font-display);font-weight:600;font-size:22px;line-height:26px;color:var(--ink-primary);display:flex;align-items:center;gap:var(--space-2)}
+.cu-body{display:flex;flex-direction:column;flex:1;min-width:0}
+.cu-name{font-family:var(--font-display);font-weight:600;font-size:22px;line-height:26px;color:var(--ink-primary);display:flex;align-items:center;gap:var(--space-2);min-width:0}
 .cu-name .cu-lock{width:14px;height:14px;color:var(--visibility-hidden);flex-shrink:0}
 .cu-name .cu-lock svg{width:100%;height:100%}
 .cu-meta{font-size:13px;line-height:18px;letter-spacing:.1px;color:var(--ink-secondary)}
@@ -180,14 +180,13 @@ body{background:#dcd8de;display:flex;flex-direction:column;align-items:center;ga
 .ac.teased{border-left-color:var(--visibility-teased);border-right-color:var(--visibility-teased);background:color-mix(in srgb,var(--visibility-teased) 10%,var(--surface-card))}
 .ac.teased .inner{border:none;justify-content:center}.ac.teased .aname{color:var(--visibility-teased)}
 .ac.secret{border:1px dashed var(--visibility-hidden)}.ac.secret .inner{border:none}
-/* already happened: recedes, but stays readable and tappable */
-.ac.past{border-left-color:var(--border-subtle);border-right-color:var(--border-subtle);background:transparent;box-shadow:none}
-.ac.past.secret{border-color:var(--border-subtle)}
-.ac.past.teased{border-left-color:var(--border-subtle);border-right-color:var(--border-subtle);background:transparent}
-.ac.past .aname{color:var(--ink-secondary)}
-.ac.past .ameta{color:var(--ink-secondary);opacity:.65}
-.ac.past .secret-badge{background:var(--border-subtle)}
-.ac.past .secret-badge svg{color:var(--ink-secondary)}
+/* Already happened. Per the design system's `past` variant: the card fills in
+   rather than fading out, and the name keeps full contrast — it's settled, not
+   diminished. Borders are neutral so the visibility colors read as live-only. */
+.ac.past{background:var(--surface-disabled);box-shadow:none;border:none;border-left:2px solid var(--past-edge);border-right:2px solid var(--past-edge)}
+.ac.past .inner{border-top:none;border-bottom:none}
+.ac.past .aname{color:var(--ink-primary)}
+.ac.past .ameta{color:var(--ink-secondary)}
 .ac .badge,.ac .secret-badge{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:10px;background:var(--visibility-hidden);display:flex;align-items:center;justify-content:center;overflow:hidden}
 .ac .badge svg,.ac .secret-badge svg{width:12px;height:12px;color:var(--ink-on-accent)}
 
@@ -432,10 +431,10 @@ function bindHome(){
   const sh=Math.floor(fs/60),eh=Math.ceil(le/60),base=sh*60;gridBase=base;
   let hh="";for(let i=sh;i<=eh;i++){const top=(i*60-base)*MPX;hh+=`<div class="hour-row" style="top:${top}px"><span class="hour-tick">${fmtHour(i)}</span><div class="hour-line"></div></div>`;}
   let ev="";dayEvts.forEach(({ev:e,i,res})=>{const top=(e.start-base)*MPX,ht=(e.end-e.start)*MPX;
-    const past=isPast(e)?" past":"";
-    if(res.mode==="teased"){ev+=`<div class="ac teased${past}" data-i="${i}" style="top:${top}px;height:${ht}px"><div class="inner"><div class="aname">Something's planned for you\u2026</div><div class="ameta">${fmtTime(e.start)} \u00b7 just show up!</div></div></div>`;}
-    else{const cls=res.mode==="secret"?"secret":res.mode==="half"?"half":"";const bdg=(res.mode==="secret"||res.mode==="half")?`<div class="secret-badge">${svg("lock")}</div>`:"";
-      ev+=`<div class="ac ${cls}${past}" data-i="${i}" style="top:${top}px;height:${ht}px"><div class="inner"><div class="aname">${e.name}</div><div class="ameta num">${fmtTime(e.start)}\u2013${fmtTime(e.end)} \u00b7 at ${e.loc}</div></div>${bdg}</div>`;}});
+    const pastF=isPast(e);
+    if(res.mode==="teased"&&!pastF){ev+=`<div class="ac teased" data-i="${i}" style="top:${top}px;height:${ht}px"><div class="inner"><div class="aname">Something's planned for you\u2026</div><div class="ameta">${fmtTime(e.start)} \u00b7 just show up!</div></div></div>`;}
+    else{const cls=pastF?"past":(res.mode==="secret"?"secret":res.mode==="half"?"half":"");const bdg=(!pastF&&(res.mode==="secret"||res.mode==="half"))?`<div class="secret-badge">${svg("lock")}</div>`:"";
+      ev+=`<div class="ac ${cls}" data-i="${i}" style="top:${top}px;height:${ht}px"><div class="inner"><div class="aname">${e.name}</div><div class="ameta num">${fmtTime(e.start)}\u2013${fmtTime(e.end)} \u00b7 at ${e.loc}</div></div>${bdg}</div>`;}});
   grid.style.height=((eh-sh)*HPX+24)+"px";grid.innerHTML=hh+'<div class="events-layer">'+ev+'</div>';
   grid.querySelectorAll(".ac").forEach(c=>c.addEventListener("click",()=>{openAct=+c.dataset.i;currentView="home-view";render();}));
 }
