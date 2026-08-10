@@ -32,6 +32,18 @@ body{background:#dcd8de;display:flex;flex-direction:column;align-items:center;ga
 
 /* screen shell */
 .screen{width:393px;height:852px;background:var(--surface-page);border-radius:34px;box-shadow:0 16px 50px rgba(60,40,60,.18);position:relative;overflow:hidden;color:var(--ink-primary);display:flex;flex-direction:column}
+
+/* On a real phone the decorative frame gets in the way: drop the desktop
+   chrome, fill the viewport, and let the in-app role switcher in Account
+   stand in for the toggle that sits above the frame on a computer. */
+@media (max-width:520px){
+  body{padding:0;gap:0;background:var(--surface-page);min-height:100dvh}
+  .role-toggle,.role-caption{display:none}
+  .screen{width:100%;height:100dvh;border-radius:0;box-shadow:none}
+  .form-head,.settle-head{padding-top:max(28px,env(safe-area-inset-top))}
+  .top-fixed{padding-top:max(28px,env(safe-area-inset-top))}
+  .nav{height:auto;min-height:80px;padding-bottom:calc(var(--space-4) + env(safe-area-inset-bottom))}
+}
 #viewRoot{flex:1;display:flex;flex-direction:column;overflow:hidden}
 
 /* nav */
@@ -168,6 +180,14 @@ body{background:#dcd8de;display:flex;flex-direction:column;align-items:center;ga
 .ac.teased{border-left-color:var(--visibility-teased);border-right-color:var(--visibility-teased);background:color-mix(in srgb,var(--visibility-teased) 10%,var(--surface-card))}
 .ac.teased .inner{border:none;justify-content:center}.ac.teased .aname{color:var(--visibility-teased)}
 .ac.secret{border:1px dashed var(--visibility-hidden)}.ac.secret .inner{border:none}
+/* already happened: recedes, but stays readable and tappable */
+.ac.past{border-left-color:var(--border-subtle);border-right-color:var(--border-subtle);background:transparent;box-shadow:none}
+.ac.past.secret{border-color:var(--border-subtle)}
+.ac.past.teased{border-left-color:var(--border-subtle);border-right-color:var(--border-subtle);background:transparent}
+.ac.past .aname{color:var(--ink-secondary)}
+.ac.past .ameta{color:var(--ink-secondary);opacity:.65}
+.ac.past .secret-badge{background:var(--border-subtle)}
+.ac.past .secret-badge svg{color:var(--ink-secondary)}
 .ac .badge,.ac .secret-badge{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:10px;background:var(--visibility-hidden);display:flex;align-items:center;justify-content:center;overflow:hidden}
 .ac .badge svg,.ac .secret-badge svg{width:12px;height:12px;color:var(--ink-on-accent)}
 
@@ -322,6 +342,7 @@ const DAYS=[{n:18,label:"Fri"},{n:19,label:"Sat"},{n:20,label:"Sun"},{n:21,label
 let currentRole="planner",currentView="home",currentDay=18,openBoard=null,openAct=null,openExp=null,tabClosed=false;
 // simulated clock: null = before the trip, else {day, min} during it
 let tripNow=null;
+let gridBase=0; // first minute rendered on the current timeline grid
 let splitOpen=false,hideOn=false,actVis="everyone",bridePaysCk=true,expBrideCk=true;
 
 const money=c=>"$"+(c/100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,",");
@@ -368,6 +389,16 @@ function resolveEv(ev,role){if(ev.vis==="everyone")return{render:true,mode:"defa
 
 // Before the trip the header counts down; once it's underway the countdown is
 // replaced by whatever happens next. The two states share one slot.
+// Picking the day you're actually on drops you at the current time; picking any
+// other day is a fresh browse, so it starts at the top.
+function scrollTimeline(){
+  const sc=document.querySelector(".timeline-scroll");if(!sc)return;
+  if(tripNow&&currentDay===tripNow.day&&document.querySelector(".hour-row")){
+    sc.scrollTop=Math.max(0,(tripNow.min-gridBase)*MPX-40);
+  }else{sc.scrollTop=0;}
+}
+// an activity is "past" once its end time has gone by on the simulated clock
+function isPast(e){return !!tripNow&&(e.day<tripNow.day||(e.day===tripNow.day&&e.end<=tripNow.min));}
 function nextUp(role){
   if(!tripNow)return null;
   const later=EVENTS.map((e,i)=>({ev:e,i,res:resolveEv(e,role)}))
@@ -393,17 +424,18 @@ function bindHome(){
   document.getElementById("addActBtn")?.addEventListener("click",()=>{currentView="home-add";splitOpen=false;hideOn=false;actVis="everyone";bridePaysCk=true;render();});
   const ds=document.getElementById("daySelector");
   ds.innerHTML=DAYS.map(d=>`<div class="day-chip ${d.n===currentDay?"on":""}" data-day="${d.n}"><span class="dnum num">${d.n}</span><span class="dlbl">${d.label}</span></div>`).join("");
-  ds.querySelectorAll(".day-chip").forEach(c=>c.addEventListener("click",()=>{currentDay=+c.dataset.day;bindHome();}));
+  ds.querySelectorAll(".day-chip").forEach(c=>c.addEventListener("click",()=>{currentDay=+c.dataset.day;bindHome();scrollTimeline();}));
   const role=currentRole,dayEvts=EVENTS.map((e,i)=>({ev:e,i,res:resolveEv(e,role)})).filter(x=>x.ev.day===currentDay&&x.res.render);
   const grid=document.getElementById("timegrid");
-  if(!dayEvts.length){grid.style.height="200px";grid.innerHTML='<div class="empty-msg">Nothing planned yet for this day.</div>';return;}
+  if(!dayEvts.length){gridBase=0;grid.style.height="200px";grid.innerHTML='<div class="empty-msg">Nothing planned yet for this day.</div>';return;}
   const fs=Math.min(...dayEvts.map(x=>x.ev.start)),le=Math.max(...dayEvts.map(x=>x.ev.end));
-  const sh=Math.floor(fs/60),eh=Math.ceil(le/60),base=sh*60;
+  const sh=Math.floor(fs/60),eh=Math.ceil(le/60),base=sh*60;gridBase=base;
   let hh="";for(let i=sh;i<=eh;i++){const top=(i*60-base)*MPX;hh+=`<div class="hour-row" style="top:${top}px"><span class="hour-tick">${fmtHour(i)}</span><div class="hour-line"></div></div>`;}
   let ev="";dayEvts.forEach(({ev:e,i,res})=>{const top=(e.start-base)*MPX,ht=(e.end-e.start)*MPX;
-    if(res.mode==="teased"){ev+=`<div class="ac teased" data-i="${i}" style="top:${top}px;height:${ht}px"><div class="inner"><div class="aname">Something's planned for you\u2026</div><div class="ameta">${fmtTime(e.start)} \u00b7 just show up!</div></div></div>`;}
+    const past=isPast(e)?" past":"";
+    if(res.mode==="teased"){ev+=`<div class="ac teased${past}" data-i="${i}" style="top:${top}px;height:${ht}px"><div class="inner"><div class="aname">Something's planned for you\u2026</div><div class="ameta">${fmtTime(e.start)} \u00b7 just show up!</div></div></div>`;}
     else{const cls=res.mode==="secret"?"secret":res.mode==="half"?"half":"";const bdg=(res.mode==="secret"||res.mode==="half")?`<div class="secret-badge">${svg("lock")}</div>`:"";
-      ev+=`<div class="ac ${cls}" data-i="${i}" style="top:${top}px;height:${ht}px"><div class="inner"><div class="aname">${e.name}</div><div class="ameta num">${fmtTime(e.start)}\u2013${fmtTime(e.end)} \u00b7 at ${e.loc}</div></div>${bdg}</div>`;}});
+      ev+=`<div class="ac ${cls}${past}" data-i="${i}" style="top:${top}px;height:${ht}px"><div class="inner"><div class="aname">${e.name}</div><div class="ameta num">${fmtTime(e.start)}\u2013${fmtTime(e.end)} \u00b7 at ${e.loc}</div></div>${bdg}</div>`;}});
   grid.style.height=((eh-sh)*HPX+24)+"px";grid.innerHTML=hh+'<div class="events-layer">'+ev+'</div>';
   grid.querySelectorAll(".ac").forEach(c=>c.addEventListener("click",()=>{openAct=+c.dataset.i;currentView="home-view";render();}));
 }
@@ -583,10 +615,12 @@ function renderViewExpense(){
   <div class="seg static"><div class="chip on" data-s="even">Split evenly</div><div class="chip" data-s="custom">Custom</div></div>
   <div class="divider-row" id="viewSplitToggle"><span class="field-label">Per person split</span><span class="chev ${splitOpen?"open":""}" id="viewSplitChev">${svg("chevDown")}</span></div>
   <div class="split-list ${splitOpen?"expanded":"collapsed"}" id="viewSplitList">${splitRows}</div>
+  ${e.status==="pending"&&isP?`<div class="btn-save" id="approveBtn"><span class="btn-label">Approve expense</span></div>`:""}
 </div>`;
 }
 function bindViewExpense(){
   document.getElementById("backBtn").addEventListener("click",()=>{currentView="expenses";openExp=null;splitOpen=false;render();});
+  document.getElementById("approveBtn")?.addEventListener("click",()=>{const e=EXPENSES.find(x=>x.id===openExp);e.status="confirmed";delete e.sub;currentView="expenses";openExp=null;splitOpen=false;render();});
   document.getElementById("viewSplitToggle").addEventListener("click",()=>{splitOpen=!splitOpen;document.getElementById("viewSplitList").className="split-list "+(splitOpen?"expanded":"collapsed");document.getElementById("viewSplitChev").classList.toggle("open",splitOpen);});
 }
 
