@@ -45,6 +45,14 @@ body{background:#dcd8de;display:flex;flex-direction:column;align-items:center;ga
 .top-fixed{flex-shrink:0;width:100%;padding:70px var(--space-5) var(--space-5);display:flex;flex-direction:column;align-items:center;gap:var(--space-5)}
 .head-row{display:flex;align-items:flex-end;justify-content:space-between;width:100%}
 .home-actions{display:flex;width:100%}
+.coming-up{width:100%;background:var(--surface-card);border-radius:var(--radius-card);padding:18px 20px;display:flex;align-items:center;justify-content:center;gap:14px;box-shadow:0 2px 10px rgba(60,40,60,.05);cursor:pointer}
+.cu-label{font-size:16px;line-height:20px;color:var(--ink-secondary);flex-shrink:0}
+.cu-body{display:flex;flex-direction:column}
+.cu-name{font-family:var(--font-display);font-weight:600;font-size:22px;line-height:26px;color:var(--ink-primary);display:flex;align-items:center;gap:var(--space-2)}
+.cu-name .cu-lock{width:14px;height:14px;color:var(--visibility-hidden);flex-shrink:0}
+.cu-name .cu-lock svg{width:100%;height:100%}
+.cu-meta{font-size:13px;line-height:18px;letter-spacing:.1px;color:var(--ink-secondary)}
+.coming-up.quiet .cu-name{font-size:18px;color:var(--ink-secondary)}
 .btn-full{width:100%;justify-content:center}
 .top-fixed.home-top{gap:var(--space-3);padding-bottom:var(--space-2)}
 .page-title{font-family:var(--font-display);font-weight:600;font-size:44px;line-height:48px;letter-spacing:-.5px}
@@ -312,6 +320,8 @@ const VIEWER={planner:"shalini",bride:"nidhi",guest:"priya"};
 const DAYS=[{n:18,label:"Fri"},{n:19,label:"Sat"},{n:20,label:"Sun"},{n:21,label:"Mon"}];
 
 let currentRole="planner",currentView="home",currentDay=18,openBoard=null,openAct=null,openExp=null,tabClosed=false;
+// simulated clock: null = before the trip, else {day, min} during it
+let tripNow=null;
 let splitOpen=false,hideOn=false,actVis="everyone",bridePaysCk=true,expBrideCk=true;
 
 const money=c=>"$"+(c/100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,",");
@@ -356,11 +366,30 @@ const EVENTS=[
 const HPX=132,MPX=HPX/60;
 function resolveEv(ev,role){if(ev.vis==="everyone")return{render:true,mode:"default"};if(ev.vis==="secret")return role==="bride"?{render:false}:{render:true,mode:"secret"};if(ev.vis==="teased")return role==="bride"?{render:true,mode:"teased"}:{render:true,mode:"half"};return{render:true,mode:"default"};}
 
+// Before the trip the header counts down; once it's underway the countdown is
+// replaced by whatever happens next. The two states share one slot.
+function nextUp(role){
+  if(!tripNow)return null;
+  const later=EVENTS.map((e,i)=>({ev:e,i,res:resolveEv(e,role)}))
+    .filter(x=>x.res.render&&(x.ev.day>tripNow.day||(x.ev.day===tripNow.day&&x.ev.start>=tripNow.min)))
+    .sort((a,b)=>a.ev.day-b.ev.day||a.ev.start-b.ev.start);
+  return later[0]||null;
+}
+function comingUpCard(role){
+  const up=nextUp(role);
+  if(!up)return`<div class="coming-up quiet"><span class="cu-label">That's a wrap:</span><div class="cu-body"><span class="cu-name">Nothing left on the schedule</span></div></div>`;
+  const {ev:e,i,res}=up,sameDay=e.day===tripNow.day,dayPart=sameDay?"":DAYS.find(d=>d.n===e.day).label+" · ";
+  if(res.mode==="teased")return`<div class="coming-up" data-i="${i}"><span class="cu-label">Coming up:</span><div class="cu-body"><span class="cu-name">Something's planned for you…</span><span class="cu-meta num">${dayPart}${fmtTime(e.start)} · just show up!</span></div></div>`;
+  const lock=(res.mode==="secret"||res.mode==="half")?`<span class="cu-lock">${svg("lock")}</span>`:"";
+  return`<div class="coming-up" data-i="${i}"><span class="cu-label">Coming up:</span><div class="cu-body"><span class="cu-name">${e.name}${lock}</span><span class="cu-meta num">${dayPart}${fmtTime(e.start)} · at ${e.loc}</span></div></div>`;
+}
 function renderHome(){
-  let h=`<div class="top-fixed home-top"><div class="header"><div class="header-title-wrap"><div class="header-title">Get pumped for Nidhi's Bach</div></div><div class="countdown"><span class="word">in</span><span class="days num">23</span><span class="word">days</span></div></div>${currentRole==="planner"?`<div class="home-actions"><div class="btn btn-primary btn-full" id="addActBtn"><span class="ic">${svg("plus")}</span><span class="btn-label">Add activity</span></div></div>`:""}<div class="date-selector" id="daySelector"></div></div><div class="timeline-scroll"><div class="timegrid" id="timegrid"></div></div>`;
+  const headSlot=tripNow?comingUpCard(currentRole):`<div class="countdown"><span class="word">in</span><span class="days num">23</span><span class="word">days</span></div>`;
+  let h=`<div class="top-fixed home-top"><div class="header"><div class="header-title-wrap"><div class="header-title">Get pumped for Nidhi's Bach</div></div>${headSlot}</div>${currentRole==="planner"?`<div class="home-actions"><div class="btn btn-primary btn-full" id="addActBtn"><span class="ic">${svg("plus")}</span><span class="btn-label">Add activity</span></div></div>`:""}<div class="date-selector" id="daySelector"></div></div><div class="timeline-scroll"><div class="timegrid" id="timegrid"></div></div>`;
   return h;
 }
 function bindHome(){
+  document.querySelector(".coming-up[data-i]")?.addEventListener("click",e=>{openAct=+e.currentTarget.dataset.i;currentView="home-view";render();});
   document.getElementById("addActBtn")?.addEventListener("click",()=>{currentView="home-add";splitOpen=false;hideOn=false;actVis="everyone";bridePaysCk=true;render();});
   const ds=document.getElementById("daySelector");
   ds.innerHTML=DAYS.map(d=>`<div class="day-chip ${d.n===currentDay?"on":""}" data-day="${d.n}"><span class="dnum num">${d.n}</span><span class="dlbl">${d.label}</span></div>`).join("");
@@ -658,10 +687,16 @@ function renderAccount(){
     <div class="group-label" style="margin-top:22px">Settings</div>
     <div class="acct-row"><span class="a-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.7 21a2 2 0 01-3.4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="rl">Notifications</span>${chevR}</div>
     <div class="acct-row"><span class="a-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="rl">Leave trip</span>${chevR}</div>
+    <div class="demo"><div class="demo-label">Demo \u00b7 trip time</div><div class="demo-seg" id="acctTimeSeg"><div class="opt ${!tripNow?"on":""}" data-t="before">Before</div><div class="opt ${tripNow&&tripNow.day===18?"on":""}" data-t="fri">Fri 7:10 PM</div><div class="opt ${tripNow&&tripNow.day===19?"on":""}" data-t="sat">Sat 10:30 AM</div></div></div>
     <div class="demo"><div class="demo-label">Demo \u00b7 view as</div><div class="demo-seg" id="acctRoleSeg"><div class="opt ${currentRole==="planner"?"on":""}" data-role="planner">Planner</div><div class="opt ${currentRole==="bride"?"on":""}" data-role="bride">Bride</div><div class="opt ${currentRole==="guest"?"on":""}" data-role="guest">Guest</div></div></div>
   </div>`;
 }
-function bindAccount(){document.getElementById("acctRoleSeg").addEventListener("click",e=>{const o=e.target.closest(".opt");if(!o)return;currentRole=o.dataset.role;render();});}
+function bindAccount(){
+  document.getElementById("acctTimeSeg").addEventListener("click",e=>{const o=e.target.closest(".opt");if(!o)return;
+    tripNow=o.dataset.t==="before"?null:o.dataset.t==="fri"?{day:18,min:19*60+10}:{day:19,min:10*60+30};
+    if(tripNow)currentDay=tripNow.day;
+    render();});
+  document.getElementById("acctRoleSeg").addEventListener("click",e=>{const o=e.target.closest(".opt");if(!o)return;currentRole=o.dataset.role;render();});}
 
 /* ========== MASTER RENDER ========== */
 const SCROLLERS=".form-scroll,.list-scroll,.acct-scroll,.timeline-scroll,.detail-scroll";
