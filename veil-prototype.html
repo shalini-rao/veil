@@ -73,13 +73,13 @@
   /* past events dim toward the page behind them */
   --past-edge:color-mix(in srgb,var(--taupe-500) 42%,var(--sand-50));
   /* type scale — sizes are shared across the three party themes so a theme
-     swap never reflows a layout. Only family and weight move. Tracking is in
-     em so it stays proportional to the size. */
-  --font-size-display:44px;--line-height-display:48px;--tracking-display:-.0114em;
+     swap never reflows a layout. Only family and weight move. Figma states
+     tracking as a percentage of the size, so it converts straight to em. */
+  --font-size-display:44px;--line-height-display:48px;--tracking-display:-.005em;
   --font-size-title:22px; --line-height-title:28px; --tracking-title:0;
   --font-size-body:16px;  --line-height-body:24px;  --tracking-body:0;
-  --font-size-caption:13px;--line-height-caption:18px;--tracking-caption:.0077em;
-  --font-size-label:12px; --line-height-label:16px; --tracking-label:.05em;
+  --font-size-caption:13px;--line-height-caption:18px;--tracking-caption:.001em;
+  --font-size-label:12px; --line-height-label:16px; --tracking-label:.006em;
 }
 /* Ivory Veil's button text is dark, which disappears on the hidden-visibility
    badge. Its icon rides accent-quiet instead. Must follow the semantic block. */
