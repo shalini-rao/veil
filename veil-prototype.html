@@ -149,10 +149,13 @@ body{background:#dcd8de;display:flex;flex-direction:column;align-items:center;ga
 .coming-up.quiet .cu-name{font-size:18px;color:var(--ink-secondary)}
 .btn-full{width:100%;justify-content:center}
 .top-fixed.home-top{gap:var(--space-4);padding-bottom:0}
-.page-title{font-family:var(--font-display);font-weight:var(--weight-display);font-size:var(--font-size-display);line-height:var(--line-height-display);letter-spacing:var(--tracking-display)}
+/* every page but home titles at the title scale; home keeps the display scale */
+.page-title{font-family:var(--font-display);font-weight:var(--weight-title);font-size:var(--font-size-title);line-height:var(--line-height-title);letter-spacing:var(--tracking-title)}
 .btn{display:inline-flex;align-items:center;gap:var(--space-1);height:40px;padding:0 20px;border-radius:var(--radius-sm);cursor:pointer}
 .btn-primary{background:var(--accent);color:var(--ink-on-accent)}
-.btn-quiet{background:var(--accent-quiet);color:var(--ink-primary)}
+/* outline variant, and the short size both variants come in */
+.btn-line{background:transparent;border:1px solid var(--accent);color:var(--accent)}
+.btn-sm{height:32px;min-height:32px;padding:0 var(--space-2)}
 .btn .ic svg{display:block;width:16px;height:16px}
 .btn-label{font-weight:600;font-size:var(--font-size-label);letter-spacing:var(--tracking-label);text-transform:uppercase;padding:var(--space-1);white-space:nowrap}
 .back-ic{cursor:pointer}.back-ic svg{display:block;width:24px;height:24px}
@@ -179,7 +182,6 @@ body{background:#dcd8de;display:flex;flex-direction:column;align-items:center;ga
 input.input{font-family:inherit;font-size:var(--font-size-body);line-height:var(--line-height-body);color:var(--ink-primary);outline:none;-webkit-appearance:none}
 input.input::placeholder{color:var(--ink-secondary)}
 .input.filled,.textarea.filled{color:var(--ink-primary)}
-.btn.btn-flat{background:var(--accent-quiet);color:var(--ink-secondary);cursor:default;opacity:.75}
 .close-line{display:flex;align-items:center;justify-content:space-between;padding:var(--space-3) 0;border-bottom:1px solid var(--border-subtle)}
 .close-line:last-of-type{border-bottom:none}
 .close-left{display:flex;flex-direction:column;gap:2px}
@@ -283,10 +285,10 @@ input.input::placeholder{color:var(--ink-secondary)}
 .ac .badge svg,.ac .secret-badge svg{width:12px;height:12px;color:var(--ink-on-hidden)}
 
 /* --- EXPENSES --- */
-.total-card{position:relative;width:100%;min-height:142px;background:var(--surface-card);border:1px solid var(--border-subtle);border-radius:var(--radius-card);padding:30px 28px 24px}
+.total-card{width:100%;background:var(--surface-card);border:1px solid var(--border-subtle);border-radius:var(--radius-card);padding:26px 23px;display:flex;align-items:center;justify-content:space-between;gap:var(--space-3)}
+.total-left{display:flex;flex-direction:column;align-items:flex-start;min-width:0}
 .owe-label{font-weight:600;font-size:var(--font-size-label);line-height:var(--line-height-label);letter-spacing:var(--tracking-label);text-transform:uppercase;color:var(--ink-secondary)}
 .owe-amount{font-family:var(--font-display);font-weight:var(--weight-display);font-size:var(--font-size-display);line-height:var(--line-height-display);letter-spacing:var(--tracking-display)}
-.total-card .actions{position:absolute;right:24px;top:25px;display:flex;flex-direction:column;gap:7px;align-items:flex-end}
 .exp-scroll{flex:1;width:100%;overflow-y:auto;padding:4px var(--space-5) 40px}
 .exp-scroll::-webkit-scrollbar{width:0}
 .exp-list{display:flex;flex-direction:column;gap:var(--space-4);width:100%}
@@ -306,7 +308,7 @@ input.input::placeholder{color:var(--ink-secondary)}
 
 /* settle */
 .settle-head{flex-shrink:0;display:flex;align-items:center;gap:var(--space-3);padding:66px var(--space-5) var(--space-4)}
-.head-title{font-family:var(--font-display);font-weight:var(--weight-display);font-size:30px}
+.head-title{font-family:var(--font-display);font-weight:var(--weight-title);font-size:var(--font-size-title);line-height:var(--line-height-title);letter-spacing:var(--tracking-title)}
 .settle-body{flex:1;overflow-y:auto;padding:0 var(--space-5) 40px}.settle-body::-webkit-scrollbar{width:0}
 .warn{border:1px solid var(--visibility-hidden);background:color-mix(in srgb,var(--visibility-hidden) 7%,transparent);border-radius:var(--radius-card);padding:var(--space-3) var(--space-4);margin-bottom:var(--space-5);display:flex;align-items:center;gap:10px}
 .warn svg{width:18px;height:18px;color:var(--visibility-hidden);flex-shrink:0}
@@ -639,7 +641,7 @@ function comingUpCard(role){
 function renderHome(){
   const isPlanner=currentRole==="planner";
   const countdown=tripNow?"":`<div class="countdown"><span class="word">in</span><span class="days num">23</span><span class="word">days</span></div>`;
-  const addBtn=isPlanner?`<div class="btn btn-outline btn-add-activity" id="addActBtn"><span class="ic">${svg("plus")}</span><span class="btn-label">Add activity</span></div>`:"";
+  const addBtn=isPlanner?`<div class="btn btn-line btn-full btn-add-activity" id="addActBtn"><span class="ic">${svg("plus")}</span><span class="btn-label">Add activity</span></div>`:"";
   const actions=(tripNow||isPlanner)?`<div class="home-actions">${tripNow?comingUpCard(currentRole):""}${addBtn}</div>`:"";
   return`<div class="top-fixed home-top"><div class="header"><div class="header-title-wrap"><div class="header-title">Get pumped for Nidhi's Bach</div><div class="header-loc">in Scottsdale, AZ</div></div>${countdown}</div>${actions}<div class="date-selector" id="daySelector"></div></div><div class="timeline-scroll"><div class="timegrid" id="timegrid"></div></div>`;
 }
@@ -761,12 +763,15 @@ function renderExpenses(){
   const role=currentRole,me=VIEWER[role],bal=balances(role),net=bal[me];
   const visible=EXPENSES.filter(e=>expVisible(e,role)),confirmed=visible.filter(e=>e.status==="confirmed"),pending=visible.filter(e=>e.status==="pending");
   const label=net<0?"You owe":net>0?"You're owed":"You're settled up",amount=net===0?"":(`<div class="owe-amount num">${money(Math.abs(net))}</div>`);
-  const closeBtn=role==="planner"?(tabClosed?`<div class="btn btn-flat"><span class="btn-label">Tab closed</span></div>`:`<div class="btn btn-primary" id="closeOutBtn"><span class="btn-label">Close out</span></div>`):"";
-  // once the tab is closed the amount owed is final, so settling up becomes the action to take
-  const settleBtn=`<div class="btn ${tabClosed&&role!=="planner"?"btn-primary":"btn-quiet"}" id="settleBtn"><span class="btn-label">Settle up</span></div>`;
+  // Nobody settles until the tab is closed, because the amount owed can still move.
+  // Closing it out is the planner's call, and once it's done the tab takes no new
+  // expenses — so the add button goes with it and settling becomes the only action.
+  const cta=tabClosed?`<div class="btn btn-primary" id="settleBtn"><span class="btn-label">Settle up</span></div>`
+    :role==="planner"?`<div class="btn btn-line" id="closeOutBtn"><span class="btn-label">Close out</span></div>`:"";
+  const addBtn=tabClosed?"":`<div class="btn btn-primary btn-sm" id="addExpBtn"><span class="ic">${svg("plus")}</span><span class="btn-label">Add</span></div>`;
   const pendingBlock=pending.length?`<div class="sect-label">${role==="planner"?"Pending approval":"Your pending"}</div>`+pending.map(e=>expCard(e,role)).join(""):"";
-  return`<div class="top-fixed"><div class="head-row"><div class="page-title">Expenses</div><div class="btn btn-primary" id="addExpBtn"><span class="ic">${svg("plus")}</span><span class="btn-label">Add</span></div></div>
-    <div class="total-card"><div class="owe-label">${label}</div>${amount}<div class="actions">${closeBtn}${settleBtn}</div></div></div>
+  return`<div class="top-fixed"><div class="head-row"><div class="page-title">Expenses</div>${addBtn}</div>
+    <div class="total-card"><div class="total-left"><div class="owe-label">${label}</div>${amount}</div>${cta}</div></div>
     <div class="exp-scroll"><div class="exp-list">${pendingBlock}${pending.length?'<div class="sect-label">Confirmed</div>':""}${confirmed.map(e=>expCard(e,role)).join("")}</div></div>`;
 }
 function expCard(e,role){const me=VIEWER[role],sh=sharesOf(e),mine=sh[me]||0,pending=e.status==="pending";
@@ -789,7 +794,7 @@ function renderSettle(){
     rows=mine.filter(t=>t.to===me).map(t=>`<div class="send-to">Collect <span class="amt num">${money(t.amount)}</span> from</div><div class="pay-card"><img class="pc-av" src="${AVATARS[t.from]}" alt=""><div><div class="pc-name">${MEMBERS[t.from].name}</div><div class="pc-handle"><span class="lbl">Venmo</span> ${MEMBERS[t.from].venmo}</div><div class="pc-handle num"><span class="lbl">Zelle</span> ${MEMBERS[t.from].zelle}</div></div></div>`).join("");}
   else{headline=`<div class="owe-line">You're all settled up.</div>`;rows="";}
   return`<div class="settle-head"><span class="back-ic" id="backBtn">${svg("back")}</span><span class="head-title">Settle your tab</span></div>
-    <div class="settle-body">${tabClosed?`<div class="closed-note">${svg("check")} <div class="closed-note-text">The tab is closed out. This amount is final.</div></div>`:`<div class="warn">${svg("warn")} <div class="warn-text">The tab hasn't been closed out yet. The amount you owe can still change.</div></div>`}${headline}${rows}<div class="done-btn" id="doneBtn">Done</div></div>`;
+    <div class="settle-body"><div class="closed-note">${svg("check")} <div class="closed-note-text">The tab is closed out. This amount is final.</div></div>${headline}${rows}<div class="done-btn" id="doneBtn">Done</div></div>`;
 }
 function bindSettle(){document.getElementById("backBtn").addEventListener("click",()=>{currentView="expenses";render();});document.getElementById("doneBtn").addEventListener("click",()=>{currentView="expenses";render();});}
 
@@ -901,7 +906,7 @@ function lastPrev(b,role){if(b.id==="announcements"){const srcs=visSrcBoards(rol
 
 function renderMessages(){
   const role=currentRole,boards=BOARDS.filter(b=>canSeeBoard(b,role)),canAdd=role==="planner";
-  let h=`<div class="top-fixed"><div class="head-row"><div class="page-title">Messages</div>${canAdd?`<div class="btn btn-primary" id="addBoardBtn"><span class="ic">${svg("plus")}</span><span class="btn-label">Add</span></div>`:""}</div></div><div class="list-scroll"><div class="board-list">`;
+  let h=`<div class="top-fixed"><div class="head-row"><div class="page-title">Messages</div>${canAdd?`<div class="btn btn-line btn-sm" id="addBoardBtn"><span class="ic">${svg("plus")}</span><span class="btn-label">Add</span></div>`:""}</div></div><div class="list-scroll"><div class="board-list">`;
   boards.forEach(b=>{const last=lastPrev(b,role);const prev=last?`<div class="board-prev"><span class="prev-sender">${MEMBERS[last.from].name}:</span><span class="prev-text">${last.text}</span></div>`:`<div class="board-prev"><span class="prev-text" style="color:var(--ink-secondary)">No messages yet</span></div>`;
     let bdg="";if(b.type==="announce")bdg=`<div class="badge pin">${svg("pin")}</div>`;else if(b.noBride)bdg=`<div class="badge secret">${svg("lock")}</div>`;
     h+=`<div class="board ${b.type} ${b.read?"read":""}" data-bid="${b.id}"><div class="board-inner"><div class="board-name">${b.name}</div>${prev}</div>${bdg}</div>`;});
