@@ -137,8 +137,9 @@ body{background:#dcd8de;display:flex;flex-direction:column;align-items:center;ga
 /* shared */
 .top-fixed{flex-shrink:0;width:100%;padding:70px var(--space-5) var(--space-5);display:flex;flex-direction:column;align-items:center;gap:var(--space-5)}
 .head-row{display:flex;align-items:flex-end;justify-content:space-between;width:100%}
-.home-actions{display:flex;width:100%}
-.coming-up{width:100%;background:var(--surface-card);border-radius:var(--radius-card);padding:18px 20px;display:flex;align-items:center;justify-content:flex-start;gap:14px;box-shadow:0 2px 10px rgba(60,40,60,.05);cursor:pointer}
+.header{width:100%;display:flex;flex-direction:column;align-items:center;gap:var(--space-3)}
+.home-actions{display:flex;flex-direction:column;gap:var(--space-2);width:100%}
+.coming-up{width:100%;background:var(--surface-card);border-radius:var(--radius-card);padding:var(--space-3) 28px;display:flex;align-items:center;justify-content:center;gap:var(--space-4);box-shadow:0 2px 10px rgba(60,40,60,.05);cursor:pointer}
 .cu-label{font-size:16px;line-height:20px;color:var(--ink-secondary);flex-shrink:0}
 .cu-body{display:flex;flex-direction:column;flex:1;min-width:0}
 .cu-name{font-family:var(--font-display);font-weight:var(--weight-title);font-size:var(--font-size-title);line-height:var(--line-height-title);letter-spacing:var(--tracking-title);color:var(--ink-primary);display:flex;align-items:center;gap:var(--space-2);min-width:0}
@@ -147,7 +148,7 @@ body{background:#dcd8de;display:flex;flex-direction:column;align-items:center;ga
 .cu-meta{font-size:var(--font-size-caption);line-height:var(--line-height-caption);letter-spacing:var(--tracking-caption);color:var(--ink-secondary)}
 .coming-up.quiet .cu-name{font-size:18px;color:var(--ink-secondary)}
 .btn-full{width:100%;justify-content:center}
-.top-fixed.home-top{gap:var(--space-3);padding-bottom:var(--space-2)}
+.top-fixed.home-top{gap:var(--space-4);padding-bottom:0}
 .page-title{font-family:var(--font-display);font-weight:var(--weight-display);font-size:var(--font-size-display);line-height:var(--line-height-display);letter-spacing:var(--tracking-display)}
 .btn{display:inline-flex;align-items:center;gap:var(--space-1);height:40px;padding:0 20px;border-radius:var(--radius-sm);cursor:pointer}
 .btn-primary{background:var(--accent);color:var(--ink-on-accent)}
@@ -174,6 +175,9 @@ body{background:#dcd8de;display:flex;flex-direction:column;align-items:center;ga
 .form-scroll::-webkit-scrollbar{width:0}
 .input{width:100%;min-height:42px;border:1px solid var(--border-subtle);border-radius:var(--radius-sm);background:var(--surface-card);padding:9px var(--space-4);display:flex;align-items:center;justify-content:flex-start;font-size:var(--font-size-body);line-height:var(--line-height-body);color:var(--ink-secondary)}
 .input.select{justify-content:space-between}
+/* the group-name field is a real input, since the name it takes ends up on the board */
+input.input{font-family:inherit;font-size:var(--font-size-body);line-height:var(--line-height-body);color:var(--ink-primary);outline:none;-webkit-appearance:none}
+input.input::placeholder{color:var(--ink-secondary)}
 .input.filled,.textarea.filled{color:var(--ink-primary)}
 .btn.btn-flat{background:var(--accent-quiet);color:var(--ink-secondary);cursor:default;opacity:.75}
 .close-line{display:flex;align-items:center;justify-content:space-between;padding:var(--space-3) 0;border-bottom:1px solid var(--border-subtle)}
@@ -238,7 +242,12 @@ body{background:#dcd8de;display:flex;flex-direction:column;align-items:center;ga
 
 .btn-outline{width:100%;min-height:40px;border:1px solid var(--accent);border-radius:var(--radius-sm);background:transparent;display:flex;align-items:center;justify-content:center;gap:var(--space-1);color:var(--accent)}
 .btn-outline .ic svg{display:block;width:16px;height:16px}
-.btn-save{width:100%;min-height:40px;border-radius:var(--radius-sm);background:var(--accent);color:var(--ink-on-accent);display:flex;align-items:center;justify-content:center}
+/* the home "add activity" button is the short 32px outline variant, not the 40px form one */
+.btn-add-activity{height:32px;min-height:32px;gap:var(--space-2);max-width:361px;margin:0 auto}
+.btn-save{width:100%;min-height:40px;border-radius:var(--radius-sm);background:var(--accent);color:var(--ink-on-accent);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.btn-save.off{opacity:.4;cursor:default}
+/* you're always in a group you made, so your own row reads but doesn't respond */
+.split-row .checkbox.locked{cursor:default}
 
 /* --- HOME timeline --- */
 .countdown{display:flex;align-items:center;justify-content:center;gap:var(--space-1);font-family:var(--font-display);font-weight:var(--weight-display)}
@@ -246,8 +255,9 @@ body{background:#dcd8de;display:flex;flex-direction:column;align-items:center;ga
 .header-title-wrap{width:100%;border-bottom:1px solid var(--border-subtle);padding:var(--space-2) 0}
 .header-title{font-family:var(--font-display);font-weight:var(--weight-display);font-size:var(--font-size-display);line-height:var(--line-height-display);letter-spacing:var(--tracking-display)}
 .header-loc{font-size:14px;line-height:20px;color:var(--ink-secondary);letter-spacing:.2px;margin-top:1px}
-.date-selector{display:flex;align-items:center;justify-content:space-between;padding:0 var(--space-2);width:100%}
-.timeline-scroll{flex:1;overflow-y:auto;padding:var(--space-2) var(--space-5) 40px;margin-top:0}
+.date-selector{display:flex;align-items:center;justify-content:space-between;padding:0 var(--space-4);width:100%}
+/* space-4 clears the day chips, the extra 8px is the grid's own inset above the first hour line */
+.timeline-scroll{flex:1;overflow-y:auto;padding:calc(var(--space-4) + 8px) var(--space-5) 40px;margin-top:0}
 .timeline-scroll::-webkit-scrollbar{width:0}
 .timegrid{position:relative;width:100%}
 .hour-row{position:absolute;left:0;width:100%;height:0}
@@ -568,7 +578,7 @@ const ROLE_CAPTIONS={
 function getCaption(){const base=currentView.split("-")[0];return(ROLE_CAPTIONS[base]||ROLE_CAPTIONS.account)[currentRole]||"";}
 
 /* ========== NAV ========== */
-function navTab(){const m={"home":"home","home-add":"home","home-view":"home","expenses":"expenses","expenses-settle":"expenses","expenses-add":"expenses","expenses-close":"expenses","expenses-view":"expenses","messages":"messages","messages-thread":"messages","account":"account"};return m[currentView]||"home";}
+function navTab(){const m={"home":"home","home-add":"home","home-view":"home","expenses":"expenses","expenses-settle":"expenses","expenses-add":"expenses","expenses-close":"expenses","expenses-view":"expenses","messages":"messages","messages-thread":"messages","messages-add":"messages","account":"account"};return m[currentView]||"home";}
 function renderNav(){
   const t=navTab();
   const tabs=[{id:"home",icon:"home",label:"Home"},{id:"expenses",icon:"dollar",label:"Expenses"},{id:"messages",icon:"inbox",label:"Inbox"},{id:"account",icon:"user",label:"Account"}];
@@ -624,10 +634,14 @@ function comingUpCard(role){
   const lock=(res.mode==="secret"||res.mode==="half")?`<span class="cu-lock">${svg("lock")}</span>`:"";
   return`<div class="coming-up" data-i="${i}"><span class="cu-label">Coming up:</span><div class="cu-body"><span class="cu-name">${e.name}${lock}</span><span class="cu-meta num">${dayPart}${fmtTime(e.start)} · at ${e.loc}</span></div></div>`;
 }
+// Once the trip is underway the countdown drops out of the header and the
+// "coming up" card takes its place down by the add button, one gap tighter.
 function renderHome(){
-  const headSlot=tripNow?comingUpCard(currentRole):`<div class="countdown"><span class="word">in</span><span class="days num">23</span><span class="word">days</span></div>`;
-  let h=`<div class="top-fixed home-top"><div class="header"><div class="header-title-wrap"><div class="header-title">Get pumped for Nidhi's Bach</div><div class="header-loc">in Scottsdale, AZ</div></div>${headSlot}</div>${currentRole==="planner"?`<div class="home-actions"><div class="btn btn-primary btn-full" id="addActBtn"><span class="ic">${svg("plus")}</span><span class="btn-label">Add activity</span></div></div>`:""}<div class="date-selector" id="daySelector"></div></div><div class="timeline-scroll"><div class="timegrid" id="timegrid"></div></div>`;
-  return h;
+  const isPlanner=currentRole==="planner";
+  const countdown=tripNow?"":`<div class="countdown"><span class="word">in</span><span class="days num">23</span><span class="word">days</span></div>`;
+  const addBtn=isPlanner?`<div class="btn btn-outline btn-add-activity" id="addActBtn"><span class="ic">${svg("plus")}</span><span class="btn-label">Add activity</span></div>`:"";
+  const actions=(tripNow||isPlanner)?`<div class="home-actions">${tripNow?comingUpCard(currentRole):""}${addBtn}</div>`:"";
+  return`<div class="top-fixed home-top"><div class="header"><div class="header-title-wrap"><div class="header-title">Get pumped for Nidhi's Bach</div><div class="header-loc">in Scottsdale, AZ</div></div>${countdown}</div>${actions}<div class="date-selector" id="daySelector"></div></div><div class="timeline-scroll"><div class="timegrid" id="timegrid"></div></div>`;
 }
 function bindHome(){
   document.querySelector(".coming-up[data-i]")?.addEventListener("click",e=>{openAct=+e.currentTarget.dataset.i;currentView="home-view";render();});
@@ -887,13 +901,50 @@ function lastPrev(b,role){if(b.id==="announcements"){const srcs=visSrcBoards(rol
 
 function renderMessages(){
   const role=currentRole,boards=BOARDS.filter(b=>canSeeBoard(b,role)),canAdd=role==="planner";
-  let h=`<div class="top-fixed"><div class="head-row"><div class="page-title">Messages</div>${canAdd?`<div class="btn btn-primary"><span class="ic">${svg("plus")}</span><span class="btn-label">Add</span></div>`:""}</div></div><div class="list-scroll"><div class="board-list">`;
+  let h=`<div class="top-fixed"><div class="head-row"><div class="page-title">Messages</div>${canAdd?`<div class="btn btn-primary" id="addBoardBtn"><span class="ic">${svg("plus")}</span><span class="btn-label">Add</span></div>`:""}</div></div><div class="list-scroll"><div class="board-list">`;
   boards.forEach(b=>{const last=lastPrev(b,role);const prev=last?`<div class="board-prev"><span class="prev-sender">${MEMBERS[last.from].name}:</span><span class="prev-text">${last.text}</span></div>`:`<div class="board-prev"><span class="prev-text" style="color:var(--ink-secondary)">No messages yet</span></div>`;
     let bdg="";if(b.type==="announce")bdg=`<div class="badge pin">${svg("pin")}</div>`;else if(b.noBride)bdg=`<div class="badge secret">${svg("lock")}</div>`;
     h+=`<div class="board ${b.type} ${b.read?"read":""}" data-bid="${b.id}"><div class="board-inner"><div class="board-name">${b.name}</div>${prev}</div>${bdg}</div>`;});
   return h+`</div></div>`;
 }
-function bindMessages(){document.querySelectorAll(".board[data-bid]").forEach(el=>el.addEventListener("click",()=>{openBoard=el.dataset.bid;currentView="messages-thread";render();}));}
+function bindMessages(){
+  document.querySelectorAll(".board[data-bid]").forEach(el=>el.addEventListener("click",()=>{openBoard=el.dataset.bid;currentView="messages-thread";render();}));
+  document.getElementById("addBoardBtn")?.addEventListener("click",()=>{newGroupName="";newGroupMembers=[];currentView="messages-add";render();});
+}
+
+/* ========== NEW MESSAGE GROUP ========== */
+// Everyone starts off the list and you start on it, so a group is secret by
+// default — it only loses the lock and the dashed border once the bride is added.
+let newGroupName="",newGroupMembers=[],newGroupN=0;
+function renderAddGroup(){
+  const me=VIEWER[currentRole];
+  const rows=ALL.filter(id=>id!==me).map(id=>{const on=newGroupMembers.includes(id);
+    return`<div class="split-row"><div class="split-left"><div class="checkbox ${on?"on":"off"} gcb" data-m="${id}">${on?svgC("check"):""}</div><span class="field-label">${MEMBERS[id].name}</span></div></div>`;}).join("")
+    +`<div class="split-row"><div class="split-left"><div class="checkbox on locked">${svgC("check")}</div><span class="field-label">You</span></div></div>`;
+  return`<div class="form-head"><span class="back-ic" id="backBtn">${svg("back")}</span><span class="form-title">New message group</span></div>
+<div class="form-scroll">
+  <input class="input" id="groupName" type="text" placeholder="Group name" value="${newGroupName.replace(/"/g,"&quot;")}">
+  <div class="group"><div class="section-label">Who's in it?</div>${rows}</div>
+  <div class="btn-save ${newGroupName.trim()?"":"off"}" id="createGroupBtn"><span class="btn-label">Create group</span></div>
+</div>`;
+}
+function bindAddGroup(){
+  document.getElementById("backBtn").addEventListener("click",()=>{currentView="messages";render();});
+  const nameEl=document.getElementById("groupName");
+  // typed live, so re-rendering the whole view on each keystroke would eat the caret
+  nameEl.addEventListener("input",()=>{newGroupName=nameEl.value;document.getElementById("createGroupBtn").classList.toggle("off",!newGroupName.trim());});
+  document.querySelectorAll(".gcb").forEach(cb=>cb.addEventListener("click",()=>{
+    const id=cb.dataset.m,i=newGroupMembers.indexOf(id);
+    if(i<0)newGroupMembers.push(id);else newGroupMembers.splice(i,1);
+    render();}));
+  document.getElementById("createGroupBtn").addEventListener("click",()=>{
+    const name=newGroupName.trim();if(!name)return;
+    const members=[...newGroupMembers,VIEWER[currentRole]],noBride=!members.includes("nidhi");
+    const id="group-"+(++newGroupN);
+    BOARDS.push({id,name,type:noBride?"nobride":"plusbride",members,noBride,read:false});
+    MSGS[id]=[];
+    newGroupName="";newGroupMembers=[];currentView="messages";render();});
+}
 
 function renderThread(boardId){
   const role=currentRole,me=VIEWER[role],board=BOARDS.find(b=>b.id===boardId),isAnn=boardId==="announcements",canCompose=!isAnn,canAnnounce=role==="planner"&&canCompose;
@@ -1236,12 +1287,15 @@ function render(){
     case"expenses-close":root.innerHTML=renderCloseOut();bindCloseOut();break;
     case"expenses-view":root.innerHTML=renderViewExpense();bindViewExpense();break;
     case"messages":root.innerHTML=renderMessages();bindMessages();break;
+    case"messages-add":root.innerHTML=renderAddGroup();bindAddGroup();break;
     case"messages-thread":root.innerHTML=renderThread(openBoard);bindThread();break;
     case"account":root.innerHTML=renderAccount();bindAccount();break;
     case"onb":root.innerHTML=renderOnb();bindOnb();break;
   }
   if(keepScroll){const now=root.querySelector(SCROLLERS);if(now)now.scrollTop=keepScroll;}
   lastView=currentView;
+  // only planners make groups, so switching out of that role drops you back to the list
+  if(currentView==="messages-add"&&currentRole!=="planner"){currentView="messages";render();return;}
   // if switching role while in a board the role can't see, bounce to list
   if(currentView==="messages-thread"&&openBoard&&openBoard!=="announcements"){const b=BOARDS.find(x=>x.id===openBoard);if(b&&!canSeeBoard(b,currentRole)){currentView="messages";openBoard=null;render();}}
 }
