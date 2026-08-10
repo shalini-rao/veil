@@ -245,7 +245,9 @@ input.input::placeholder{color:var(--ink-secondary)}
 .btn-outline{width:100%;min-height:40px;border:1px solid var(--accent);border-radius:var(--radius-sm);background:transparent;display:flex;align-items:center;justify-content:center;gap:var(--space-1);color:var(--accent)}
 .btn-outline .ic svg{display:block;width:16px;height:16px}
 /* the home "add activity" button is the short 32px outline variant, not the 40px form one */
-.btn-add-activity{height:32px;min-height:32px;gap:var(--space-2);max-width:361px;margin:0 auto}
+.btn-add-activity{height:32px;min-height:32px;gap:var(--space-2);max-width:361px}
+/* before the trip the button sits in the header, on the day selector's inset */
+.add-row{width:100%;display:flex;padding:0 var(--space-4)}
 .btn-save{width:100%;min-height:40px;border-radius:var(--radius-sm);background:var(--accent);color:var(--ink-on-accent);display:flex;align-items:center;justify-content:center;cursor:pointer}
 .btn-save.off{opacity:.4;cursor:default}
 /* you're always in a group you made, so your own row reads but doesn't respond */
@@ -256,7 +258,7 @@ input.input::placeholder{color:var(--ink-secondary)}
 .countdown .word{font-size:22px;color:var(--ink-secondary)}.countdown .days{font-size:44px;letter-spacing:-.5px;color:var(--accent)}
 .header-title-wrap{width:100%;border-bottom:1px solid var(--border-subtle);padding:var(--space-2) 0}
 .header-title{font-family:var(--font-display);font-weight:var(--weight-display);font-size:var(--font-size-display);line-height:var(--line-height-display);letter-spacing:var(--tracking-display)}
-.header-loc{font-size:14px;line-height:20px;color:var(--ink-secondary);letter-spacing:.2px;margin-top:1px}
+.header-loc{font-size:var(--font-size-caption);line-height:var(--line-height-caption);letter-spacing:var(--tracking-caption);color:var(--ink-secondary)}
 .date-selector{display:flex;align-items:center;justify-content:space-between;padding:0 var(--space-4);width:100%}
 /* space-4 clears the day chips, the extra 8px is the grid's own inset above the first hour line */
 .timeline-scroll{flex:1;overflow-y:auto;padding:calc(var(--space-4) + 8px) var(--space-5) 40px;margin-top:0}
@@ -636,14 +638,15 @@ function comingUpCard(role){
   const lock=(res.mode==="secret"||res.mode==="half")?`<span class="cu-lock">${svg("lock")}</span>`:"";
   return`<div class="coming-up" data-i="${i}"><span class="cu-label">Coming up:</span><div class="cu-body"><span class="cu-name">${e.name}${lock}</span><span class="cu-meta num">${dayPart}${fmtTime(e.start)} · at ${e.loc}</span></div></div>`;
 }
-// Once the trip is underway the countdown drops out of the header and the
-// "coming up" card takes its place down by the add button, one gap tighter.
+// Before the trip the header carries the countdown, and the add button tucks under it
+// on the day selector's inset. Once the trip starts the countdown gives way to the
+// "coming up" card down below, and the button follows it there, flush and one gap tighter.
 function renderHome(){
   const isPlanner=currentRole==="planner";
-  const countdown=tripNow?"":`<div class="countdown"><span class="word">in</span><span class="days num">23</span><span class="word">days</span></div>`;
   const addBtn=isPlanner?`<div class="btn btn-line btn-full btn-add-activity" id="addActBtn"><span class="ic">${svg("plus")}</span><span class="btn-label">Add activity</span></div>`:"";
-  const actions=(tripNow||isPlanner)?`<div class="home-actions">${tripNow?comingUpCard(currentRole):""}${addBtn}</div>`:"";
-  return`<div class="top-fixed home-top"><div class="header"><div class="header-title-wrap"><div class="header-title">Get pumped for Nidhi's Bach</div><div class="header-loc">in Scottsdale, AZ</div></div>${countdown}</div>${actions}<div class="date-selector" id="daySelector"></div></div><div class="timeline-scroll"><div class="timegrid" id="timegrid"></div></div>`;
+  const headExtra=tripNow?"":`<div class="countdown"><span class="word">in</span><span class="days num">23</span><span class="word">days</span></div>`+(addBtn?`<div class="add-row">${addBtn}</div>`:"");
+  const actions=tripNow?`<div class="home-actions">${comingUpCard(currentRole)}${addBtn}</div>`:"";
+  return`<div class="top-fixed home-top"><div class="header"><div class="header-title-wrap"><div class="header-title">Get pumped for Nidhi's Bach</div><div class="header-loc">in Scottsdale, AZ</div></div>${headExtra}</div>${actions}<div class="date-selector" id="daySelector"></div></div><div class="timeline-scroll"><div class="timegrid" id="timegrid"></div></div>`;
 }
 function bindHome(){
   document.querySelector(".coming-up[data-i]")?.addEventListener("click",e=>{openAct=+e.currentTarget.dataset.i;currentView="home-view";render();});
@@ -766,7 +769,9 @@ function renderExpenses(){
   // Nobody settles until the tab is closed, because the amount owed can still move.
   // Closing it out is the planner's call, and once it's done the tab takes no new
   // expenses — so the add button goes with it and settling becomes the only action.
-  const cta=tabClosed?`<div class="btn btn-primary" id="settleBtn"><span class="btn-label">Settle up</span></div>`
+  // Settling is an action for the people who have to send money, so it only shows to
+  // someone in the red — being owed means waiting on everyone else, not doing anything.
+  const cta=tabClosed?(net<0?`<div class="btn btn-primary" id="settleBtn"><span class="btn-label">Settle up</span></div>`:"")
     :role==="planner"?`<div class="btn btn-line" id="closeOutBtn"><span class="btn-label">Close out</span></div>`:"";
   const addBtn=tabClosed?"":`<div class="btn btn-primary btn-sm" id="addExpBtn"><span class="ic">${svg("plus")}</span><span class="btn-label">Add</span></div>`;
   const pendingBlock=pending.length?`<div class="sect-label">${role==="planner"?"Pending approval":"Your pending"}</div>`+pending.map(e=>expCard(e,role)).join(""):"";
