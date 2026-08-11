@@ -573,6 +573,9 @@ input.input::placeholder{color:var(--ink-secondary)}
   </div>
 <script>
 
+// Bumped by hand on each push, so the account page can answer "did my change land?"
+const BUILD="08-10 17:20";
+
 const IC={
 home:'<path d="M9 21V13.6C9 13.04 9 12.76 9.109 12.546C9.205 12.358 9.358 12.205 9.546 12.109C9.76 12 10.04 12 10.6 12H13.4C13.96 12 14.24 12 14.454 12.109C14.642 12.205 14.795 12.358 14.891 12.546C15 12.76 15 13.04 15 13.6V21M11.018 2.764L4.235 8.039C3.782 8.392 3.555 8.568 3.392 8.789C3.247 8.984 3.14 9.205 3.074 9.439C3 9.704 3 9.991 3 10.565V17.8C3 18.92 3 19.48 3.218 19.908C3.41 20.284 3.716 20.59 4.092 20.782C4.52 21 5.08 21 6.2 21H17.8C18.92 21 19.48 21 19.908 20.782C20.284 20.59 20.59 20.284 20.782 19.908C21 19.48 21 18.92 21 17.8V10.565C21 9.991 21 9.704 20.926 9.439C20.86 9.205 20.753 8.984 20.608 8.789C20.445 8.568 20.218 8.392 19.765 8.039L12.982 2.764C12.631 2.491 12.455 2.354 12.261 2.302C12.09 2.255 11.91 2.255 11.739 2.302C11.545 2.354 11.369 2.491 11.018 2.764Z"/>',
 dollar:'<path d="M6 16C6 18.209 7.791 20 10 20H14C16.209 20 18 18.209 18 16C18 13.791 16.209 12 14 12H10C7.791 12 6 10.209 6 8C6 5.791 7.791 4 10 4H14C16.209 4 18 5.791 18 8M12 2V22"/>',
@@ -1041,6 +1044,7 @@ function renderAccount(){
     <div class="demo"><div class="demo-label">Demo \u00b7 view as</div><div class="demo-seg" id="acctRoleSeg"><div class="opt ${currentRole==="planner"?"on":""}" data-role="planner">Planner</div><div class="opt ${currentRole==="bride"?"on":""}" data-role="bride">Bride</div><div class="opt ${currentRole==="guest"?"on":""}" data-role="guest">Guest</div></div></div>
     <div class="demo"><div class="demo-label">Demo \u00b7 theme</div><div class="demo-seg tight" id="acctThemeSeg">${Object.keys(THEMES).map(k=>`<div class="opt ${currentTheme===k?"on":""}" data-th="${k}">${THEMES[k].label}</div>`).join("")}</div><div class="demo-hint">A property of the weekend, set once at setup. Everyone inherits it.</div></div>
     <div class="demo"><div class="demo-label">Demo \u00b7 replay onboarding</div><div class="demo-seg four" id="acctOnbSeg"><div class="opt" data-e="fresh">Fresh</div><div class="opt" data-e="planner">Planner link</div><div class="opt" data-e="bride">Bride link</div><div class="opt" data-e="guest">Guest link</div></div><div class="demo-hint">Fresh start builds the party. The three links only make a profile \u2014 the link sets the role.</div></div>
+    <div class="demo"><div class="demo-label">Demo \u00b7 build ${BUILD}</div><div class="demo-seg" id="acctReloadSeg"><div class="opt">Get the latest version</div></div><div class="demo-hint">Installed from the home screen there is no address bar to pull on, and the page is cached for up to ten minutes. This refetches it, skipping the cache.</div></div>
   </div>`;
 }
 function bindAccount(){
@@ -1050,7 +1054,11 @@ function bindAccount(){
     render();});
   document.getElementById("acctRoleSeg").addEventListener("click",e=>{const o=e.target.closest(".opt");if(!o)return;currentRole=o.dataset.role;render();});
   document.getElementById("acctThemeSeg").addEventListener("click",e=>{const o=e.target.closest(".opt");if(!o)return;currentTheme=o.dataset.th;render();});
-  document.getElementById("acctOnbSeg").addEventListener("click",e=>{const o=e.target.closest(".opt");if(!o)return;startOnb(o.dataset.e);});}
+  document.getElementById("acctOnbSeg").addEventListener("click",e=>{const o=e.target.closest(".opt");if(!o)return;startOnb(o.dataset.e);});
+  // a fresh query string is a URL the cache has never seen, which is the only reliable
+  // way to force a refetch from inside a standalone app with no address bar
+  document.getElementById("acctReloadSeg").addEventListener("click",()=>{
+    const u=new URL(location.href);u.searchParams.set("v",Date.now());location.replace(u.toString());});}
 
 /* ========== ONBOARDING ==========
    Runs before a theme exists, so every screen renders against the neutral
