@@ -2,7 +2,7 @@
   "name": "Veil",
   "short_name": "Veil",
   "description": "Bachelorette planning built around a bride who sees less than everyone else.",
-  "start_url": "veil-prototype.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
