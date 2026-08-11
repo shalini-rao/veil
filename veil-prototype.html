@@ -102,13 +102,20 @@
   --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:24px;--space-6:32px;--space-7:48px;
   --color-off-white:#fffefb;
   --elevation:2px 4px 6px rgba(0,0,0,0.15);
-  /* The Figma frames are the whole 393x852 device, so a header's 70px top padding is
-     measured from the top of the display and already contains the status bar — it is
-     not padding added below it. Same for the 32px under the nav and the home indicator.
-     So the designed value is the floor, and the safe area only ever raises it on a
-     device whose notch needs more than the design allowed for. */
-  --head-top:max(70px,calc(env(safe-area-inset-top) + var(--space-3)));
-  --head-top-sm:max(66px,calc(env(safe-area-inset-top) + var(--space-3)));
+  /* Headers are specified the way you'd measure them on a phone: from the top of the
+     display to the top of the capital letters in the title — 112px for a page title,
+     62px for the message thread's nav bar, matching WhatsApp on an iPhone 16 Pro.
+     Two things sit between that number and a padding value:
+       --sb   how much of the display is above our viewport. Added to the home screen,
+              iOS hands a standalone app a viewport that already starts below the status
+              bar, so nothing we do can reach into it. measureTopInset() finds it.
+       slack  the leading and the ascender gap above the caps, which is font-dependent.
+              7px is a decent guess for the display faces at these sizes; alignTops()
+              measures the real number per title after the webfonts land and overrides
+              these with an exact inline padding. This is the pre-measurement fallback. */
+  --sb:0px;
+  --head-top:max(0px,calc(112px - var(--sb) - 7px));
+  --head-top-sm:max(0px,calc(62px - var(--sb) - 7px));
   --nav-bottom:max(var(--space-6),calc(env(safe-area-inset-bottom) + var(--space-1)));
 }
 /* ---- type styles ---- */
@@ -184,7 +191,9 @@ input,textarea,.body-text,.pc-handle,.v{-webkit-user-select:text;user-select:tex
 .cu-meta{font-size:var(--font-size-caption);line-height:var(--line-height-caption);letter-spacing:var(--tracking-caption);color:var(--ink-secondary)}
 .coming-up.quiet .cu-name{font-size:18px;color:var(--ink-secondary)}
 .btn-full{width:100%;justify-content:center}
-.top-fixed.home-top{gap:var(--space-4);padding-bottom:0}
+/* the timeline scrolls under this block, so the gap has to live here rather than on the
+   scroller's padding — that would ride up with the content the moment you flick it */
+.top-fixed.home-top{gap:var(--space-4);padding-bottom:var(--space-2)}
 /* every page but home titles at the title scale; home keeps the display scale */
 .page-title{font-family:var(--font-display);font-weight:var(--weight-title);font-size:var(--font-size-title);line-height:var(--line-height-title);letter-spacing:var(--tracking-title)}
 .btn{display:inline-flex;align-items:center;gap:var(--space-1);height:40px;padding:0 20px;border-radius:var(--radius-sm);cursor:pointer}
@@ -207,7 +216,7 @@ input,textarea,.body-text,.pc-handle,.v{-webkit-user-select:text;user-select:tex
 .day-chip .dlbl{font-weight:600;font-size:var(--font-size-label);line-height:var(--line-height-label);letter-spacing:var(--tracking-label);text-transform:uppercase;margin-top:1px}
 
 /* form fields */
-.form-head{flex-shrink:0;display:flex;align-items:center;gap:var(--space-3);padding:var(--head-top-sm) var(--space-5) var(--space-4)}
+.form-head{flex-shrink:0;display:flex;align-items:center;gap:var(--space-3);padding:var(--head-top) var(--space-5) var(--space-4)}
 .form-title{font-family:var(--font-display);font-weight:var(--weight-title);font-size:var(--font-size-title);line-height:var(--line-height-title);letter-spacing:var(--tracking-title)}
 .form-scroll{flex:1;overflow-y:auto;padding:0 var(--space-5) 40px;display:flex;flex-direction:column;gap:20px}
 .form-scroll>*{flex-shrink:0}
@@ -345,7 +354,7 @@ input.input::placeholder{color:var(--ink-secondary)}
 .badge.secret svg{color:var(--ink-on-hidden)}
 
 /* settle */
-.settle-head{flex-shrink:0;display:flex;align-items:center;gap:var(--space-3);padding:var(--head-top-sm) var(--space-5) var(--space-4)}
+.settle-head{flex-shrink:0;display:flex;align-items:center;gap:var(--space-3);padding:var(--head-top) var(--space-5) var(--space-4)}
 .head-title{font-family:var(--font-display);font-weight:var(--weight-title);font-size:var(--font-size-title);line-height:var(--line-height-title);letter-spacing:var(--tracking-title)}
 .settle-body{flex:1;overflow-y:auto;padding:0 var(--space-5) 40px}.settle-body::-webkit-scrollbar{width:0}
 .warn{border:1px solid var(--visibility-hidden);background:color-mix(in srgb,var(--visibility-hidden) 7%,transparent);border-radius:var(--radius-card);padding:var(--space-3) var(--space-4);margin-bottom:var(--space-5);display:flex;align-items:center;gap:10px}
@@ -436,7 +445,7 @@ input.input::placeholder{color:var(--ink-secondary)}
   background:var(--surface-page);color:var(--ink-primary);font-family:var(--font-body)}
 .onb-scroll{flex:1;overflow-y:auto;padding:var(--head-top) 28px 20px;display:flex;flex-direction:column}
 /* the theme step carries the most content — tighten it so all three cards fit unscrolled */
-.onb-scroll.tight{padding-top:46px}
+.onb-scroll.tight{padding-top:max(0px,calc(88px - var(--sb) - 7px))}
 .onb-scroll.tight .onb-party{margin-bottom:24px}
 .onb-scroll.tight .onb-field{margin-bottom:18px}
 .onb-scroll.tight .onb-theme{margin-bottom:10px}
@@ -552,6 +561,9 @@ input.input::placeholder{color:var(--ink-secondary)}
 </style>
 </head>
 <body>
+  <!-- env() can only be read off a real declaration, so this carries the top inset out
+       to JS. Zero-sized and out of flow so it can never affect the layout it reports on. -->
+  <div id="saProbe" style="position:fixed;top:0;left:0;width:0;height:0;padding-top:env(safe-area-inset-top);pointer-events:none;visibility:hidden"></div>
   <div class="role-toggle" id="roleToggle">
     <button data-role="planner" class="on">Planner</button>
     <button data-role="bride">Bride</button>
@@ -574,7 +586,7 @@ input.input::placeholder{color:var(--ink-secondary)}
 <script>
 
 // Bumped by hand on each push, so the account page can answer "did my change land?"
-const BUILD="08-10 17:20";
+const BUILD="08-10 19:40";
 
 const IC={
 home:'<path d="M9 21V13.6C9 13.04 9 12.76 9.109 12.546C9.205 12.358 9.358 12.205 9.546 12.109C9.76 12 10.04 12 10.6 12H13.4C13.96 12 14.24 12 14.454 12.109C14.642 12.205 14.795 12.358 14.891 12.546C15 12.76 15 13.04 15 13.6V21M11.018 2.764L4.235 8.039C3.782 8.392 3.555 8.568 3.392 8.789C3.247 8.984 3.14 9.205 3.074 9.439C3 9.704 3 9.991 3 10.565V17.8C3 18.92 3 19.48 3.218 19.908C3.41 20.284 3.716 20.59 4.092 20.782C4.52 21 5.08 21 6.2 21H17.8C18.92 21 19.48 21 19.908 20.782C20.284 20.59 20.59 20.284 20.782 19.908C21 19.48 21 18.92 21 17.8V10.565C21 9.991 21 9.704 20.926 9.439C20.86 9.205 20.753 8.984 20.608 8.789C20.445 8.568 20.218 8.392 19.765 8.039L12.982 2.764C12.631 2.491 12.455 2.354 12.261 2.302C12.09 2.255 11.91 2.255 11.739 2.302C11.545 2.354 11.369 2.491 11.018 2.764Z"/>',
@@ -1325,6 +1337,102 @@ const ONB_CAPTIONS={
   links:"<b>ONBOARDING</b> · the link set is derived from the role answers — nothing you don't need."
 };
 
+/* ========== TOP ALIGNMENT ==========
+   Headers are specified from the top of the display to the top of the capital letters,
+   the way you'd measure one phone against another: 112px for a page title, 62px for the
+   thread's nav bar. Getting from that to a padding value takes two measurements that
+   only exist at runtime — how much display sits above our viewport, and how much empty
+   leading each theme's display face carries above its caps. */
+
+/* How many CSS pixels of the display are above the viewport's top edge.
+   Added to the home screen with the default status bar style, iOS starts the viewport
+   below the status bar, so that band is unreachable and has to be subtracted from every
+   target. screen.height minus innerHeight is exactly that band. Where the safe-area
+   inset resolves to something (Android, or a translucent status bar) the viewport does
+   span the notch, so nothing is above us and the targets apply as written. */
+function measureTopInset(){
+  const probe=document.getElementById("saProbe");
+  if(probe&&parseFloat(getComputedStyle(probe).paddingTop)>0)return 0;
+  // on a desktop the 393x852 frame stands in for the whole device
+  if(!window.matchMedia("(max-width:520px)").matches)return 0;
+  if(window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true){
+    const d=Math.round(window.screen.height-window.innerHeight);
+    // an on-screen keyboard shrinks the viewport too, which reads as an absurd status
+    // bar — keep the last believable measurement rather than guessing again
+    if(d>=20&&d<=100)return measureTopInset.last=d;
+    if(measureTopInset.last)return measureTopInset.last;
+  }
+  // in a phone browser the address bar has already taken the top of the display, and it
+  // is about a status bar deep — assume as much so the browser preview reads like the app
+  return 62;
+}
+
+/* Distance from the top of a text element's first line box to the top of its capitals:
+   half the leading, plus the gap between the font's ascender and its cap height. Both
+   move with the theme, since each theme brings its own display face. */
+function capInset(el){
+  const cs=getComputedStyle(el),size=parseFloat(cs.fontSize);
+  const lh=cs.lineHeight==="normal"?size*1.2:parseFloat(cs.lineHeight);
+  const ctx=capInset.ctx||(capInset.ctx=document.createElement("canvas").getContext("2d"));
+  ctx.font=`${cs.fontStyle} ${cs.fontWeight} ${size}px ${cs.fontFamily}`;
+  const m=ctx.measureText("H");
+  const asc=m.fontBoundingBoxAscent,desc=m.fontBoundingBoxDescent,cap=m.actualBoundingBoxAscent;
+  if(!(asc>0&&cap>0))return 7;  // pre-webfont, or a browser without the metrics
+  return (lh-(asc+desc))/2+(asc-cap);
+}
+
+/* container selector, the title inside it to align, and the target from the display top */
+const TOP_ALIGN=[
+  [".top-fixed.home-top",".header-title",112],
+  [".top-fixed",".page-title",112],
+  [".form-head",".form-title",112],
+  [".settle-head",".head-title",112],
+  [".thread-head",".thread-title",62],
+  [".acct-scroll",".page-title",112],
+  [".onb-scroll.tight",":scope > *",88],
+  [".onb-scroll",":scope > *",112]
+];
+function alignTops(){
+  const sb=measureTopInset();
+  document.documentElement.style.setProperty("--sb",sb+"px");
+  const done=new Set();
+  for(const[boxSel,titleSel,target]of TOP_ALIGN){
+    document.querySelectorAll(boxSel).forEach(box=>{
+      if(done.has(box))return;
+      const title=box.querySelector(titleSel);
+      // the splash and the centred steps have no title row to hang a measurement on
+      if(!title||!title.textContent.trim()||title.classList.contains("onb-center"))return;
+      done.add(box);
+      box.style.paddingTop="0px";box.style.marginTop="0px";
+      // a scrolled container would report its title from wherever it currently sits
+      const keep=box.scrollTop;if(keep)box.scrollTop=0;
+      const lead=title.getBoundingClientRect().top-box.getBoundingClientRect().top+capInset(title);
+      if(keep)box.scrollTop=keep;
+      const pad=target-sb-lead;
+      // the thread's 62px lands its caps level with the top of the viewport, so the empty
+      // leading above them has nowhere to go but off the top edge
+      if(pad>=0)box.style.paddingTop=pad+"px";else box.style.marginTop=pad+"px";
+    });
+  }
+}
+/* the status bar sliver is painted from theme-color, so it has to follow whatever is
+   actually behind the top of the screen — the page surface, or the thread's card header */
+function syncThemeColor(){
+  let el=document.elementFromPoint(Math.round(window.innerWidth/2),1);
+  while(el){
+    const bg=getComputedStyle(el).backgroundColor;
+    const m=/^rgba?\(([^)]+)\)/.exec(bg);
+    if(m){const p=m[1].split(",").map(parseFloat);if(p.length<4||p[3]>0){
+      document.querySelector('meta[name="theme-color"]').setAttribute("content",`rgb(${p[0]}, ${p[1]}, ${p[2]})`);
+      return;}}
+    el=el.parentElement;
+  }
+}
+function afterRender(){alignTops();syncThemeColor();}
+// the fallback metrics are only right once the display faces have actually arrived
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(afterRender);
+addEventListener("resize",afterRender);
+
 /* ========== MASTER RENDER ========== */
 const SCROLLERS=".form-scroll,.list-scroll,.acct-scroll,.timeline-scroll,.detail-scroll";
 let lastView=null;
@@ -1357,6 +1465,7 @@ function render(){
   }
   if(keepScroll){const now=root.querySelector(SCROLLERS);if(now)now.scrollTop=keepScroll;}
   lastView=currentView;
+  afterRender();
   // only planners make groups, so switching out of that role drops you back to the list
   if(currentView==="messages-add"&&currentRole!=="planner"){currentView="messages";render();return;}
   // if switching role while in a board the role can't see, bounce to list
